@@ -5,6 +5,8 @@ class StudentDashboard {
     //  Logged IN used detail
     this.user = JSON.parse(localStorage.getItem('user'));
 
+    // To track the current user updating the enrollment
+    this.currentUpdateId = null;
     // Filter Status
 
     this.status = '';
@@ -259,6 +261,46 @@ class StudentDashboard {
           break;
       }
     });
+
+    $('#updateApplyBtn').on('click', () => {
+      this.submitUpdate();
+    });
+  }
+
+  async submitUpdate() {
+    try {
+      const id = this.currentUpdateId;
+
+      if (!this.updateFormValidate()) {
+        return;
+      }
+
+      if (await this.checkDuplicateEnrollment) {
+        return;
+      }
+
+      const SweetResponse = await Swal.fire({
+        title: 'Are you sure you want to update?',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+      });
+
+      if (SweetResponse.isConfirmed) {
+        const payload = await this.getUpdatePayload();
+        await this.updateEnrollment(id, payload);
+        toastr.success('Updated Successfully!');
+
+        await this.loadEnrollment();
+
+        await this.getStats();
+
+        this.updateModal.hide();
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   async loadUpdateData(id) {
@@ -330,11 +372,45 @@ class StudentDashboard {
     return false;
   }
 
+  getUpdatePayload() {
+    const course = $('#updateCourse').find(':selected');
+    const centre = $('#updateCentre').find(':selected');
+
+    return {
+      courseId: course.data('id'),
+      courseName: course.val(),
+      deptId: course.data('depid'),
+      deptName: course.data('department'),
+      fees: $('#updateFees').val(),
+      centreId: centre.data('id'),
+      centre: centre.val(),
+      preferredDate: $('#updateExamDate').val(),
+      updatedAt: new Date().toISOString().split('T')[0],
+    };
+  }
+
+  async updateEnrollment(id, payload) {
+    const response = await fetch(`${ENROLL_API}/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update enrollment.');
+    }
+
+    return response;
+  }
+
   handleUpdate(id) {
     try {
       const data = this.loadUpdateData();
       this.populateUpdateForm(data);
       this.setupCourseFeeListener(data.coursedata);
+      this.currentUpdateId = id;
     } catch (error) {
       console.log(error);
     }

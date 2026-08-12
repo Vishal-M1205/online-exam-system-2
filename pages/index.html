@@ -1,396 +1,487 @@
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <script src="https://code.jquery.com/jquery-4.0.0.min.js" integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="../styles/index.css">
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+    <script
+      src="https://code.jquery.com/jquery-4.0.0.min.js"
+      integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao="
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="../styles/index.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
     <title>ScholarHub</title>
-</head>
-<body class="position-relative">
-       <!-- =====================================================
+  </head>
+  <body class="position-relative">
+    <!-- =====================================================
      NAVBAR SECTION
      Includes Login, Signup options.
     ===================================================== -->
-    <nav class="navbar navbar-expand-lg " id="navbar">
-        <div class="navbar-brand text-white ms-4 fs-4">
-           <span class="bi bi-mortarboard-fill"></span> ScholarHub
-        </div>
-        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navCollapse">
-             <span class="bi bi-list  text-pink"></span>
-        </button>
-       <div class="navbar-collapse collapse text-center" id="navCollapse">
-         <ul class="navbar-nav ms-auto gap-2 me-3">
-            <li><a href="#" data-bs-toggle="modal" data-bs-target="#loginModal" class="btn btn-pink text-white fw-semibold rounded-pill">Login</a></li>
-            <li><a href="#" data-bs-toggle="modal" data-bs-target="#signupModal" class="btn btn-pink-outline text-pink fw-semibold rounded-pill">Sign Up</a></li>
-         </ul> 
-
-       </div>
+    <nav class="navbar navbar-expand-lg" id="navbar">
+      <div class="navbar-brand text-white ms-4 fs-4">
+        <span class="bi bi-mortarboard-fill"></span> ScholarHub
+      </div>
+      <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navCollapse">
+        <span class="bi bi-list text-pink"></span>
+      </button>
+      <div class="navbar-collapse collapse text-center" id="navCollapse">
+        <ul class="navbar-nav ms-auto gap-2 me-3">
+          <li>
+            <a
+              href="#"
+              data-bs-toggle="modal"
+              data-bs-target="#loginModal"
+              class="btn btn-pink text-white fw-semibold rounded-pill"
+              >Login</a
+            >
+          </li>
+          <li>
+            <a
+              href="#"
+              data-bs-toggle="modal"
+              data-bs-target="#signupModal"
+              class="btn btn-pink-outline text-pink fw-semibold rounded-pill"
+              >Sign Up</a
+            >
+          </li>
+        </ul>
+      </div>
     </nav>
 
-       <!-- =====================================================
+    <!-- =====================================================
      HERO SECTION
      Includes Title adn Images with animation
 ===================================================== -->
 
-   <div class="container" style="margin-top: 100px;">
-    <section class="hero row align-items-center my-5 ">
-
-        
+    <div class="container" style="margin-top: 100px">
+      <section class="hero row align-items-center my-5">
         <div class="col-12 col-md-6">
-            <div class="d-inline-flex align-items-center gap-1 rounded-pill mb-3 text-white bg-navy px-3 py-2">
-                <span class="bi bi-mortarboard-fill"></span>
-                <span>ScholarHub</span>
-            </div>
+          <div
+            class="d-inline-flex align-items-center gap-1 rounded-pill mb-3 text-white bg-navy px-3 py-2"
+          >
+            <span class="bi bi-mortarboard-fill"></span>
+            <span>ScholarHub</span>
+          </div>
 
-            <h1 class="fw-bold display-4" id="hero-title">
-                Empowering Digital Assessments
-            </h1>
+          <h1 class="fw-bold display-4" id="hero-title">Empowering Digital Assessments</h1>
 
-            <p class="text-muted fs-5" id="hero-subtitle">
-                Secure, smart, and seamless online examinations.
-            </p>
+          <p class="text-muted fs-5" id="hero-subtitle">
+            Secure, smart, and seamless online examinations.
+          </p>
 
-            <div class="d-flex gap-2 mt-4">
-                <a href="#" class="btn btn-pink text-white fw-semibold rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#loginModal">
-                    Login
-                </a>
+          <div class="d-flex gap-2 mt-4">
+            <a
+              href="#"
+              class="btn btn-pink text-white fw-semibold rounded-pill px-4"
+              data-bs-toggle="modal"
+              data-bs-target="#loginModal"
+            >
+              Login
+            </a>
 
-                <a href="#" class="btn btn-pink-outline text-pink fw-semibold rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#signupModal">
-                    Sign Up
-                </a>
-            </div>
+            <a
+              href="#"
+              class="btn btn-pink-outline text-pink fw-semibold rounded-pill px-4"
+              data-bs-toggle="modal"
+              data-bs-target="#signupModal"
+            >
+              Sign Up
+            </a>
+          </div>
         </div>
 
-       
         <div class="col-12 col-md-6 text-center" id="hero-design">
-            <div class="d-none d-md-block float-animation ">
-                 <img src="../assets/images/Exams-bro.svg" alt="" class="img-fluid pink-shadow" width="60%">
-            </div>
-           
-            
+          <div class="d-none d-md-block float-animation">
+            <img
+              src="../assets/images/Exams-bro.svg"
+              alt=""
+              class="img-fluid pink-shadow"
+              width="60%"
+            />
+          </div>
         </div>
+      </section>
+    </div>
 
-    </section>
-
-
-</div>
-
-     <!-- =====================================================
+    <!-- =====================================================
      FEATUE SECTION
      Includes Cards with flip animation 
 ===================================================== -->
 
- <section class="container " style="margin-top: 200px; margin-bottom: 200px;">
-    <h1 class="text-center my-5 fw-bold">Features</h1>
-    <div class="d-flex justify-content-center align-content-center">
-        
-
+    <section class="container" style="margin-top: 200px; margin-bottom: 200px">
+      <h1 class="text-center my-5 fw-bold">Features</h1>
+      <div class="d-flex justify-content-center align-content-center">
         <div class="row g-3">
-       
-        <div class="col-xl-3 col-sm-6 col-12">
-            <div class="d-flex flex-column align-items-md-end align-items-center justify-content-center">
-                <div class="flip-card bg-white rounded-4">
-        <div class="flip-card-inner ">
-        <div class="flip-card-front mt-5 mx-3">
-             <div class="">
-                <i class="bi bi-person-plus-fill fs-1 text-pink"></i>
-                <h4 class="fw-bold text-navy">Student <br> Registration</h4>
+          <div class="col-xl-3 col-sm-6 col-12">
+            <div
+              class="d-flex flex-column align-items-md-end align-items-center justify-content-center"
+            >
+              <div class="flip-card bg-white rounded-4">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front mt-5 mx-3">
+                    <div class="">
+                      <i class="bi bi-person-plus-fill fs-1 text-pink"></i>
+                      <h4 class="fw-bold text-navy">
+                        Student <br />
+                        Registration
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="flip-card-back mt-4 mx-3">
+                    <div>
+                      <h5 class="text-pink">Get Started</h5>
+                      <p>
+                        Create an account and join available courses to access examinations and
+                        track progress.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-        </div>
-        <div class="flip-card-back mt-4 mx-3">
-           <div>
-                <h5 class="text-pink">Get Started</h5>
-                <p>
-                    Create an account and join available courses
-                    to access examinations and track progress.
-                </p>
+          </div>
+          <div class="col-xl-3 col-sm-6 col-12">
+            <div
+              class="d-flex flex-column align-items-md-start align-items-center justify-content-center"
+            >
+              <div class="flip-card bg-white rounded-4">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front mt-5 mx-3">
+                    <div class="">
+                      <i class="bi bi-journal-check fs-1 text-pink"></i>
+                      <h4 class="fw-bold text-navy">
+                        Course <br />
+                        Enrollment
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="flip-card-back mt-4 mx-3">
+                    <div>
+                      <h5 class="text-pink">Enroll Easily</h5>
+                      <p>
+                        Browse available courses and register for examinations based on your
+                        curriculum.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-        </div>
-    </div>
-</div>
+          </div>
+          <div class="col-xl-3 col-sm-6 col-12">
+            <div
+              class="d-flex flex-column align-items-md-end align-items-center justify-content-center"
+            >
+              <div class="flip-card bg-white rounded-4">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front mt-5 mx-3">
+                    <div class="">
+                      <i class="bi bi-clipboard-data-fill fs-1 text-pink"></i>
+                      <h4 class="fw-bold text-navy">Results <br />& Reports</h4>
+                    </div>
+                  </div>
+                  <div class="flip-card-back mt-4 mx-3">
+                    <div>
+                      <h5 class="text-pink">Track Performance</h5>
+                      <p>
+                        View examination results, scores, and detailed performance analytics
+                        instantly.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          
-        </div>
-        <div class="col-xl-3 col-sm-6 col-12">
-         <div class="d-flex flex-column align-items-md-start align-items-center justify-content-center">
-               <div class="flip-card bg-white rounded-4">
-        <div class="flip-card-inner ">
-        <div class="flip-card-front mt-5 mx-3">
-             <div class="">
-                <i class="bi bi-journal-check fs-1 text-pink"></i>
-                <h4 class="fw-bold text-navy">Course <br> Enrollment</h4>
+          </div>
+          <div class="col-xl-3 col-sm-6 col-12">
+            <div
+              class="d-flex flex-column align-items-md-start align-items-center justify-content-center"
+            >
+              <div class="flip-card bg-white rounded-4">
+                <div class="flip-card-inner">
+                  <div class="flip-card-front mt-5 mx-3">
+                    <div class="">
+                      <i class="bi bi-calendar-event fs-1 text-pink"></i>
+                      <h4 class="fw-bold text-navy">
+                        Exam <br />
+                        Scheduling
+                      </h4>
+                    </div>
+                  </div>
+                  <div class="flip-card-back mt-4 mx-3">
+                    <div>
+                      <h5 class="text-pink">Managed by Admin</h5>
+                      <p>
+                        Administrators approve requests, assign dates, and organize examination
+                        schedules efficiently.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-        <div class="flip-card-back mt-4 mx-3">
-           <div>
-                <h5 class="text-pink">Enroll Easily</h5>
-                <p>
-                    Browse available courses and register for
-            examinations based on your curriculum.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
-         </div>
+      </div>
+    </section>
 
-          
-        </div>
-        <div class="col-xl-3 col-sm-6 col-12">
-            <div class="d-flex flex-column align-items-md-end align-items-center justify-content-center">
-                  <div class="flip-card bg-white rounded-4">
-        <div class="flip-card-inner ">
-        <div class="flip-card-front mt-5 mx-3">
-             <div class="">
-                <i class="bi bi-clipboard-data-fill fs-1 text-pink"></i>
-                <h4 class="fw-bold text-navy">Results <br>& Reports</h4>
-            </div>
-        </div>
-        <div class="flip-card-back mt-4 mx-3">
-           <div>
-                <h5 class="text-pink">Track Performance</h5>
-                <p>
-                    View examination results, scores, and detailed
-            performance analytics instantly.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
-            </div>
-          
-        </div>
-        <div class="col-xl-3 col-sm-6 col-12">
-            <div class="d-flex flex-column align-items-md-start align-items-center justify-content-center">
-         <div class="flip-card bg-white rounded-4">
-        <div class="flip-card-inner ">
-        <div class="flip-card-front mt-5 mx-3">
-             <div class="">
-                <i class="bi bi-calendar-event fs-1 text-pink"></i>
-                <h4 class="fw-bold text-navy">Exam <br> Scheduling</h4>
-            </div>
-        </div>
-        <div class="flip-card-back mt-4 mx-3">
-           <div>
-                <h5 class="text-pink">Managed by Admin</h5>
-                <p>
-                    Administrators approve requests, assign dates,
-            and organize examination schedules efficiently.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
-       
-            </div>
-           </div>
-    </div>
-    </div>
-    
- </section>
-
-     <!-- =====================================================
+    <!-- =====================================================
     FLOATING INSTRUCTION BUTTON
 ===================================================== -->
 
- <span class="position-fixed cursor-pointer rounded-circle bg-navy text-white fs-3 p-3 icon-tooltip"
-                 data-tooltip="Instructions" style="bottom:10%; right: 5%;" data-bs-toggle="modal" data-bs-target="#instructionModal" id="instructionBtn">
-   <i class="bi bi-info-circle-fill"></i>
- </span>
+    <span
+      class="position-fixed cursor-pointer rounded-circle bg-navy text-white fs-3 p-3 icon-tooltip"
+      data-tooltip="Instructions"
+      style="bottom: 10%; right: 5%"
+      data-bs-toggle="modal"
+      data-bs-target="#instructionModal"
+      id="instructionBtn"
+    >
+      <i class="bi bi-info-circle-fill"></i>
+    </span>
 
-      <!-- =====================================================
+    <!-- =====================================================
      FOOTER SECTION
 ===================================================== -->
 
- <section class="footer  bg-navy text-center fw-semibold text-light py-2 bottom-0 ">
+    <section class="footer bg-navy text-center fw-semibold text-light py-2 bottom-0">
       ©️ Scholar - 2026
- </section>
+    </section>
 
-<!-- Instructions Modal -->
-<div class="modal fade" id="instructionModal" tabindex="-1" aria-labelledby="instructionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <!-- Instructions Modal -->
+    <div
+      class="modal fade"
+      id="instructionModal"
+      tabindex="-1"
+      aria-labelledby="instructionModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
+          <div class="modal-header bg-pink text-white">
+            <h5 class="modal-title fw-bold" id="instructionModalLabel">
+              <i class="bi bi-card-checklist me-2"></i>
+              Examination Instructions
+            </h5>
 
-            <div class="modal-header bg-pink text-white">
-                <h5 class="modal-title fw-bold" id="instructionModalLabel">
-                    <i class="bi bi-card-checklist me-2 "></i>
-                    Examination Instructions
-                </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
 
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <div class="modal-body">
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle-fill me-2"></i>
+              Please read the following instructions carefully before applying for an examination.
             </div>
 
-            <div class="modal-body">
+            <ol class="ps-3">
+              <li class="mb-3">
+                <p class="fw-bold mb-0">Login</p>
+                <br />
+                Login using your registered account to access the Student Dashboard.
+              </li>
 
-                <div class="alert alert-info">
-                    <i class="bi bi-info-circle-fill me-2"></i>
-                    Please read the following instructions carefully before applying for an examination.
-                </div>
+              <li class="mb-3">
+                <p class="fw-bold mb-0">Enroll for an Examination</p>
+                <br />
+                Navigate to the <span class="fw-bold">Courses</span> page and select the course you
+                wish to take.
+              </li>
 
-                <ol class="ps-3">
+              <li class="mb-3">
+                <p class="fw-bold mb-0">Select Test Centre & Exam Date</p>
+                <br />
+                Choose your preferred examination centre and available exam date before submitting
+                your application.
+              </li>
 
-                    <li class="mb-3">
-                        <p class="fw-bold mb-0">Login</p><br>
-                        Login using your registered account to access the Student Dashboard.
-                    </li>
+              <li class="mb-3">
+                <p class="fw-bold mb-0">Pending Approval</p>
+                <br />
+                After submitting the application, its status will change to
+                <span class="badge bg-warning text-dark">Pending</span>. Your application will be
+                reviewed by the administrator.
+              </li>
 
-                    <li class="mb-3">
-                        <p class="fw-bold mb-0">Enroll for an Examination</p><br>
-                        Navigate to the <span class="fw-bold">Courses</span> page and select the course you wish to take.
-                    </li>
+              <li class="mb-3">
+                <p class="fw-bold mb-0">Application Approved</p>
+                <br />
+                If your application is approved, the status becomes
+                <span class="badge bg-success">Approved</span>. Once the examination date has
+                arrived, a <span class="fw-bold">Check</span> button will be available.
+              </li>
 
-                    <li class="mb-3">
-                        <p class="fw-bold mb-0">Select Test Centre & Exam Date</p><br>
-                        Choose your preferred examination centre and available exam date before submitting your application.
-                    </li>
+              <li class="mb-3">
+                <p class="fw-bold mb-0">Mark as Attended</p>
+                <br />
+                Click the <span class="fw-bold">Check</span> button after attending the examination.
+                The status will be updated to <span class="badge bg-primary">Attended</span>.
+              </li>
 
-                    <li class="mb-3">
-                        <p class="fw-bold mb-0">Pending Approval</p><br>
-                        After submitting the application, its status will change to
-                        <span class="badge bg-warning text-dark">Pending</span>.
-                        Your application will be reviewed by the administrator.
-                    </li>
+              <li class="mb-3">
+                <p class="fw-bold mb-0">Rejected Applications</p>
+                <br />
+                If your application is rejected, the status becomes
+                <span class="badge bg-danger">Rejected</span>. The administrator will provide a
+                reason for the rejection.
+              </li>
 
-                    <li class="mb-3">
-                        <p class="fw-bold mb-0">Application Approved</p><br>
-                        If your application is approved, the status becomes
-                        <span class="badge bg-success">Approved</span>.
-                        Once the examination date has arrived, a <span class="fw-bold">Check</span> button will be available.
-                    </li>
+              <li class="mb-3">
+                <p class="fw-bold mb-0">Editing an Application</p>
+                <br />
+                Applications can only be edited while they are in the
+                <span class="badge bg-warning text-dark">Pending</span>
+                state.
+              </li>
 
-                    <li class="mb-3">
-                        <p class="fw-bold mb-0">Mark as Attended</p><br>
-                        Click the <span class="fw-bold">Check</span> button after attending the examination. The status will be updated to
-                        <span class="badge bg-primary">Attended</span>.
-                    </li>
+              <li class="mb-3">
+                <p class="fw-bold mb-0">Reapply</p>
+                <br />
+                If your application has been rejected, you may correct the required details and
+                submit a new application.
+              </li>
+            </ol>
+          </div>
 
-                    <li class="mb-3">
-                        <p class="fw-bold mb-0">Rejected Applications</p><br>
-                        If your application is rejected, the status becomes
-                        <span class="badge bg-danger">Rejected</span>.
-                        The administrator will provide a reason for the rejection.
-                    </li>
-
-                    <li class="mb-3">
-                        <p class="fw-bold mb-0">Editing an Application</p><br>
-                        Applications can only be edited while they are in the
-                        <span class="badge bg-warning text-dark">Pending</span>
-                        state.
-                    </li>
-
-                    <li class="mb-3">
-                        <p class="fw-bold mb-0">Reapply</p><br>
-                        If your application has been rejected, you may correct the required details and submit a new application.
-                    </li>
-
-                </ol>
-
-            </div>
-
-            <div class="modal-footer">
-                <button class="btn btn-pink text-white" data-bs-dismiss="modal">
-                    <i class="bi bi-check-circle me-1"></i>
-                    Got It
-                </button>
-            </div>
-
+          <div class="modal-footer">
+            <button class="btn btn-pink text-white" data-bs-dismiss="modal">
+              <i class="bi bi-check-circle me-1"></i>
+              Got It
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
-<!-- Login Modal -->
-<div class=" modal fade" data-bs-backdrop="static" id="loginModal">
-  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-     <div class="modal-content rounded-4">
+    <!-- Login Modal -->
+    <div class="modal fade" data-bs-backdrop="static" id="loginModal">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content rounded-4">
           <div class="modal-header bg-pink text-white rounded-top-4">
-              <h4 class="modal-title">Login</h4>
-              <button class="btn btn-close ms-auto" data-bs-dismiss="modal"></button>
+            <h4 class="modal-title">Login</h4>
+            <button class="btn btn-close ms-auto" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
-             <form action="" id="login-form">
-                <label for="loginEmail" class="form-label">Email</label>
-                <input type="text" class="form-control " id="loginEmail" name="loginEmail">
-                <label for="loginPass" class="form-label">Password</label>
-                <input type="password" class="form-control" id="loginPass" name="loginPass">
-             </form>
-             
+            <form action="" id="login-form">
+              <label for="loginEmail" class="form-label">Email</label>
+              <input type="text" class="form-control" id="loginEmail" name="loginEmail" />
+              <label for="loginPass" class="form-label">Password</label>
+              <input type="password" class="form-control" id="loginPass" name="loginPass" />
+            </form>
           </div>
           <div class="modal-footer">
-             <button class="btn btn-pink text-white ms-auto" id="logModalBtn" form="login-form">Login</button>
+            <button class="btn btn-pink text-white ms-auto" id="logModalBtn" form="login-form">
+              Login
+            </button>
           </div>
-     </div>
-  </div>
-</div>
-
-<!-- Signup Modal -->
-<div class="modal fade " data-bs-backdrop="static" id="signupModal">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-     <div class="modal-content rounded-4">
-        <div class="modal-header bg-pink text-white rounded-top-4">
-            <h4 class="modal-title">Sign Up</h4>
-            <button class="btn btn-close " data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body">
-             
-            <form action="" id="signup-form">
-                 
-            <label for="name" class="form-label">Name</label>
-            <input type="text" id="name" name="name" class="form-control mb-2">
-            <label for="email" class="form-label">Email</label>
-            <input type="text" id="email" name="email" class="form-control mb-2">
-            <label for="pass" class="form-label">Password</label>
-            <input type="password" id="pass" name="pass" class="form-control mb-2">
-            <label for="cpass" class="form-label">Confirm Password</label>
-            <input type="password" id="cpass" name="cpass" class="form-control mb-2">
-            <label for="dob" class="form-label">Date of Birth</label>
-            <input type="date" id="dob" class="form-control mb-2" name="dob" onkeydown="{return false;}" >
-            <label for="gender" class="form-label">Gender</label>
-            <div class="d-flex gap-2">
-                <div class="form-check">
-                <label for="male" class="form-check-label">Male</label>
-              <input type="radio" name="gender" id="male" value="Male" class="form-check-input">
-            </div>
-            <div class="form-check">
-                 <label for="female" class="form-check-label">Female</label>
-              <input type="radio" name="gender" id="female" value="Female" class="form-check-input">
-            </div>
-            </div>
-            <label for="college" class="form-label">College Name</label>
-            <input type="text" id="college" name="college" class="form-control mb-2" >
-            <label for="department" class="form-label">Department</label>
-            <select  id="department" name="department" class="form-select mb-2">
-                 
-            </select>
-            <label for="mobile" class="form-label">Mobile No.</label>
-            <input type="tel"  id="mobile" name="mobile" class="form-control">
-
-            </form>
-         
-        </div>
-        <div class="modal-footer">
-            <button class="btn btn-pink text-white ms-auto" id="signModalBtn" form="signup-form">Sign Up</button>
-        </div>
-     </div>
-
+      </div>
     </div>
-</div>
 
+    <!-- Signup Modal -->
+    <div class="modal fade" data-bs-backdrop="static" id="signupModal">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content rounded-4">
+          <div class="modal-header bg-pink text-white rounded-top-4">
+            <h4 class="modal-title">Sign Up</h4>
+            <button class="btn btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <form action="" id="signup-form">
+              <label for="name" class="form-label">Name</label>
+              <input type="text" id="name" name="name" class="form-control mb-2" />
+              <label for="email" class="form-label">Email</label>
+              <input type="text" id="email" name="email" class="form-control mb-2" />
+              <label for="pass" class="form-label">Password</label>
+              <input type="password" id="pass" name="pass" class="form-control mb-2" />
+              <label for="cpass" class="form-label">Confirm Password</label>
+              <input type="password" id="cpass" name="cpass" class="form-control mb-2" />
+              <label for="dob" class="form-label">Date of Birth</label>
+              <input
+                type="date"
+                id="dob"
+                class="form-control mb-2"
+                name="dob"
+                onkeydown="
+                  {
+                    return false;
+                  }
+                "
+              />
+              <label for="gender" class="form-label">Gender</label>
+              <div class="d-flex gap-2">
+                <div class="form-check">
+                  <label for="male" class="form-check-label">Male</label>
+                  <input
+                    type="radio"
+                    name="gender"
+                    id="male"
+                    value="Male"
+                    class="form-check-input"
+                  />
+                </div>
+                <div class="form-check">
+                  <label for="female" class="form-check-label">Female</label>
+                  <input
+                    type="radio"
+                    name="gender"
+                    id="female"
+                    value="Female"
+                    class="form-check-input"
+                  />
+                </div>
+              </div>
+              <label for="college" class="form-label">College Name</label>
+              <input type="text" id="college" name="college" class="form-control mb-2" />
+              <label for="department" class="form-label">Department</label>
+              <select id="department" name="department" class="form-select mb-2"></select>
+              <label for="mobile" class="form-label">Mobile No.</label>
+              <input type="tel" id="mobile" name="mobile" class="form-control" />
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-pink text-white ms-auto" id="signModalBtn" form="signup-form">
+              Sign Up
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
- <!-- Images Floating in the Hero Section -->
- <i class="bi bi-rocket-takeoff-fill text-pink   position-absolute  pulse-animation" style="top: 10%; font-size: 100px; left: 20%; z-index: -999; opacity: 10%;"></i>
- <i class="bi  bi-graph-up-arrow text-pink   position-absolute  pulse-animation" style="top: 40%; font-size: 100px; left: 20%; z-index: -999; opacity: 10%;"></i>
- <i class="bi  bi-mortarboard-fill text-pink   position-absolute  pulse-animation" style="top: 30%; font-size: 100px; right: 10%; z-index: -999; opacity: 10%;"></i>
+    <!-- Images Floating in the Hero Section -->
+    <i
+      class="bi bi-rocket-takeoff-fill text-pink position-absolute pulse-animation"
+      style="top: 10%; font-size: 100px; left: 20%; z-index: -999; opacity: 10%"
+    ></i>
+    <i
+      class="bi bi-graph-up-arrow text-pink position-absolute pulse-animation"
+      style="top: 40%; font-size: 100px; left: 20%; z-index: -999; opacity: 10%"
+    ></i>
+    <i
+      class="bi bi-mortarboard-fill text-pink position-absolute pulse-animation"
+      style="top: 30%; font-size: 100px; right: 10%; z-index: -999; opacity: 10%"
+    ></i>
 
-
- <script type="module" src="../scripts/api.js"></script>
-<script type="module" src="../scripts/index.js"></script>
-
-</body>
+    <script type="module" src="../scripts/api.js"></script>
+    <script type="module" src="../scripts/index.js"></script>
+  </body>
 </html>

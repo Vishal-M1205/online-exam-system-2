@@ -250,7 +250,7 @@ class StudentDashboard {
   }
 
   setupEvents() {
-    $('#parent').on('clcik', '[data-action]', (e) => {
+    $('#parent').on('click', '[data-action]', (e) => {
       const button = e.currentTarget;
       const action = button.dataset.action;
       const id = button.dataset.id;
@@ -267,6 +267,18 @@ class StudentDashboard {
     });
   }
 
+  async confirmUpdate(){
+    const response = await Swal.fire({
+        title: 'Are you sure you want to update?',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+      });
+
+      return response.isConfirmed;
+  }
+
   async submitUpdate() {
     try {
       const id = this.currentUpdateId;
@@ -275,19 +287,13 @@ class StudentDashboard {
         return;
       }
 
-      if (await this.checkDuplicateEnrollment) {
+      if (await this.checkDuplicateEnrollment(id)) {
         return;
       }
 
-      const SweetResponse = await Swal.fire({
-        title: 'Are you sure you want to update?',
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-      });
+      const confirmUpdateResponse  = await this.confirmUpdate()
 
-      if (SweetResponse.isConfirmed) {
+      if (confirmUpdateResponse) {
         const payload = await this.getUpdatePayload();
         await this.updateEnrollment(id, payload);
         toastr.success('Updated Successfully!');
@@ -308,7 +314,7 @@ class StudentDashboard {
     const courseData = await courseResponse.json();
 
     const enrollResponse = await fetch(`${ENROLL_API}/${id}`);
-    const enrollData = await response.json();
+    const enrollData = await enrollResponse.json();
 
     return {
       courseData,
@@ -318,13 +324,13 @@ class StudentDashboard {
 
   populateUpdateForm(data) {
     const enrollment = data.enrollData;
-    const coures = data.courseData;
+    const course = data.courseData;
 
     $(`#updateCourse option[data-id="${enrollment.courseId}"]`).prop('selected', true);
     $(`#updateCentre option[data-id="${enrollment.centreId}"]`).prop('selected', true);
 
     if (enrollment.courseId) {
-      const fees = courseData.filter((c) => c.courseId == enrollment.courseId);
+      const fees = course.filter((c) => c.courseId == enrollment.courseId);
 
       $('#updateFees').val(fees[0].fees);
     }
@@ -349,19 +355,19 @@ class StudentDashboard {
   updateFormValidate() {
     if (!$('#updateCourse').find(':selected').data('id')) {
       toastr.warning('Empty Course Field !');
-      return flase;
+      return false;
     } else if (!$('#updateCentre').find(':selected').data('id')) {
       toastr.warning('Empty Centre Field !');
-      return flase;
+      return false;
     } else if (!$('#updateExamDate').val()) {
       toastr.warning('Empty Date Field !');
-      return flase;
+      return false;
     }
     return true;
   }
 
   async checkDuplicateEnrollment(id) {
-    const checkResponse = await fetch(`${ENROLL_API}?userId=${userDetails[0].id}&isDeleted=false`);
+    const checkResponse = await fetch(`${ENROLL_API}?userId=${this.user[0].id}&isDeleted=false`);
     const checkData = await checkResponse.json();
     for (let e of checkData) {
       if (e.courseName === $('#updateCourse').find(':selected').val() && id != e.id) {
@@ -405,11 +411,11 @@ class StudentDashboard {
     return response;
   }
 
-  handleUpdate(id) {
+  async handleUpdate(id) {
     try {
-      const data = this.loadUpdateData();
+      const data =await  this.loadUpdateData(id);
       this.populateUpdateForm(data);
-      this.setupCourseFeeListener(data.coursedata);
+      this.setupCourseFeeListener(data.courseData);
       this.currentUpdateId = id;
     } catch (error) {
       console.log(error);
@@ -421,6 +427,7 @@ class StudentDashboard {
     this.getStats();
     this.loadEnrollment();
     this.setUsername();
+    this.setupEvents();
   }
 }
 

@@ -284,7 +284,7 @@
       "status": "Pending",
       "reason": "",
       "isDeleted": false,
-      "updatedAt": "2026-06-29",
+      "updatedAt": "2026-08-13",
       "id": "ohnUSAZ36WM"
     },
     {
@@ -298,11 +298,11 @@
       "fees": "50000",
       "centreId": 1,
       "centre": "Coimbatore",
-      "preferredDate": "2026-07-09",
-      "status": "Rejected",
-      "reason": "No seats kindly change the date",
+      "preferredDate": "2026-08-21",
+      "status": "Pending",
+      "reason": "",
       "createdAt": "2026-06-29",
-      "updatedAt": "2026-06-29",
+      "updatedAt": "2026-08-13",
       "isDeleted": false,
       "id": "gWWLJ4IpBbs"
     },

@@ -1,665 +1,528 @@
-import {COURSE_API,USER_API,CENTRE_API,ENROLL_API} from '../scripts/api.js';
+import { COURSE_API, USER_API, CENTRE_API, ENROLL_API } from '../scripts/api.js';
+import { DashboardUtils } from './utils/DashboardUtils.js';
+import { CourseService } from './services/CousreService.js';
+import { EnrollmentServices } from './services/EnrollmentServices.js';
+import { StudentService } from './services/StudentService.js';
+import { CentreService } from './services/CentreService.js';
+import { Statistics } from './utils/Statistics.js';
+import { ConfirmationService } from './utils/ConfirmationService.js';
 
-const userDetails = JSON.parse(localStorage.getItem('user'));
+class AdminDashboard {
+  constructor() {
+    this.dashboardUtil = new DashboardUtils();
+    this.courseService = new CourseService();
+    this.enrollmentServices = new EnrollmentServices();
+    this.statistics = new Statistics();
+    this.studentService = new StudentService();
+    this.centreService = new CentreService();
+    this.confiramationService = new ConfirmationService();
 
-//Updating user detail offcanvas 
-$("#userNameOffCanvas").text(userDetails[0].name)
-$("#userRole").text(userDetails[0].role)
-$("#userEmail").text(userDetails[0].email)
-$("#userGender").text(userDetails[0].gender)
-$("#userDob").text(dateFormat(userDetails[0].dob))
-$("#userDepartment").text(userDetails[0].departmentName)
-$("#userCollege").text(userDetails[0].college)
-$("#userMobile").text(userDetails[0].mobile)
+    this.user = this.dashboardUtils.getUserData();
 
+    this.currentEnrollId = null;
 
-//For maintaining the state in while applying filter used in URLSearchParams
-let status = "";
-let searchQuery = "";
-let courseQuery = "";
-let examDateQuery = "";
+    //For maintaining the state in while applying filter used in URLSearchParams
+    this.status = '';
+    this.searchQuery = '';
+    this.courseQuery = '';
+    this.examDateQuery = '';
 
-//Pagination variables
-let page = 1;
-let perPage = 5
-let totalPages = 0;
+    //Pagination variables
+    this.page = 1;
+    this.perPage = 5;
+    this.totalPages = 0;
+    //Deleted default state
+    this.isDeleted = false;
+    //Modal from the DOM
+    this.rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
+    this.filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
+  }
 
-//Deleted default state 
-let isDeleted = false;
+  setupEvents() {
+    $('#parent').on('click', '[data-action]', (e) => {
+      const button = e.currentTarget;
+      const action = button.dataset.action;
+      const id = button.dataset.id;
 
-//Modal from the DOM
-const rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
-const filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
+      switch (action) {
+        case 'view':
+          this.handleView(id);
+          break;
+        case 'approve':
+          this.handleApprove(id);
+          break;
+        case 'reject':
+          this.currentEnrollId = id;
+          break;
+        case 'permanentDelete':
+          this.handleDelete(id);
+          break;
+        case 'restore':
+          this.handleRestore(id);
+          break;
+      }
+    });
+    //Event Listner fot the Filter Modal
+    $('#filterAplyBtn').on('click', () => {
+      if ($('#courseNameFilter').val() || $('#examDateFilter').val()) {
+        this.courseQuery = $('#courseNameFilter').val();
+        this.examDateQuery = $('#examDateFilter').val();
+        $('#clrFilter').prop('disabled', false);
+        this.resetPagination();
+        this.loadEnrollments();
+        this.filterModal.hide();
+      } else {
+        toastr.warning('Atleast Select One Filter');
+      }
+    });
 
+    //Clears the filter
+    $('#clrFilter').on('click', () => {
+      $('#courseNameFilter').val('');
+      $('#examDateFilter').val('');
+      this.courseQuery = '';
+      this.examDateQuery = '';
+      $('#clrFilter').prop('disabled', true);
+      this.resetPagination();
+      this.loadEnrollments();
+    });
 
-//toastr Configuration
-toastr.options = {
-        "positionClass": "toast-bottom-right",
-        "showDuration": "300",
-        "preventDuplicates": true
+    $('#rejectSubmit').on('click', () => {
+      this.handleReject();
+    });
+
+    $('#nextPage').on('click', () => {
+      if (this.page < this.totalPages) {
+        this.page += 1;
+        $('#pageNum').text(this.page);
+
+        this.loadEnrollments();
+      }
+    });
+    $('#prevPage').on('click', () => {
+      if (this.page > 1) {
+        this.page -= 1;
+        $('#pageNum').text(this.page);
+
+        this.loadEnrollments();
+      }
+    });
+
+    $('#searchInput').on('input', function () {
+      this.page = 1;
+      $('#pageNum').text(this.page);
+      this.searchQuery = $('#searchInput').val();
+
+      this.loadEnrollments();
+    });
+    $('#courseCard').on('click', () => {
+      window.location.assign('../pages/coursesPage.html');
+    });
+
+    $('#allBtn,#enrollmentCard').on('click', () => {
+      this.setBtnState('');
+    });
+
+    $('#apprBtn,#approveCard').on('click', () => {
+      this.setBtnState('Approved');
+    });
+
+    $('#pendBtn,#pendCard').on('click', () => {
+      this.setBtnState('Pending');
+    });
+
+    $('#rejBtn,#rejectCard').on('click', () => {
+      this.setBtnState('Rejected');
+    });
+
+    $('#deletedBtn').on('click', () => {
+      if (this.status == 'Attended') {
+        this.status = '';
+        this.setBtnState('');
+      }
+      if (!this.isDeleted) {
+        this.isDeleted = true;
+      } else {
+        this.isDeleted = false;
       }
 
+      this.loadEnrollments();
+      $(this).toggleClass('btn-blue');
+    });
 
-//Helper function for Date - output : Aug 06,2026
-function dateFormat(date){
-  let newDate = new Date(date)
-  newDate = newDate.toDateString().split(" ")
-   return `${newDate[1]} ${newDate[2]},${newDate[3]}`
+    $('#attendedBtn').on('click', () => {
+      this.resetPagination();
+      $('#deletedBtn').removeClass('btn-blue');
+      $(this).toggleClass('btn-blue');
+      this.isDeleted = false;
+      if (this.status == 'Attended') {
+        this.status = '';
+        $('#allBtn').addClass('btn-pink-gradient');
+      } else {
+        this.status = 'Attended';
+        $('#allBtn').removeClass('btn-pink-gradient');
+      }
+      $('#apprBtn').removeClass('btn-pink-gradient');
+      $('#pendBtn').removeClass('btn-pink-gradient');
+      $('#rejBtn').removeClass('btn-pink-gradient');
 
-}
+      getRecordOnStatus();
+    });
 
+    $('#centreCard').on('click', async () => {
+      try {
+        const data = await this.centreService.getCentre();
+        this.renderCentre(data);
+      } catch (error) {
+        toastr.error(error.message);
+      }
+    });
 
-//Setting user name in the navbar
-$('#userName').text(userDetails[0].name.split(' ')[0]);
+    $('#studentCard').on('click', () => {
+      window.location.assign('../pages/userPage.html');
+    });
+  }
 
-//logout button in the navbar
-$('#logoutBtn').on('click',async ()=>{
-  const response = await  Swal.fire({
-    title: 'Are you sure you want to logout?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33'
-    }) 
+  resetPagination() {
+    this.page = 1;
+    $('#pageNum').text(this.page);
+  }
 
-    if(response.isConfirmed){
-        window.location.replace('../pages/index.html');
-        localStorage.removeItem('user');
-    }
-})
-
-//Populating the select tag in the Filter Modal
-async function addCourseFilter() {
-    try {
-
-        const response = await fetch(COURSE_API);
-        const data = await response.json();
-        const parent = document.getElementById('courseNameFilter');
-        let html = `<option value="">Selected None</option>`;
-        data.forEach((c)=>{
-            html += `
+  renderCourseFilterOption(data) {
+    const parent = document.getElementById('courseNameFilter');
+    let html = `<option value="">Selected None</option>`;
+    data.forEach((c) => {
+      html += `
             <option value="${c.courseName}">${c.courseName}</option>
-            `
-        })
-        parent.innerHTML = html;
-        
-    } catch (error) {
-        toastr.error(error.message)
-    }
-
-    
-} 
-
-addCourseFilter();
-
-//Event Listner fot the Filter Modal
-$('#filterAplyBtn').on('click',()=>{
-  if($('#courseNameFilter').val()||$("#examDateFilter").val()){
-    courseQuery = $('#courseNameFilter').val();
-   examDateQuery  = $("#examDateFilter").val();
-   page=1
-    $('#pageNum').text(page);
-   getRecordOnStatus();
-   $('#clrFilter').prop('disabled',false);
-   filterModal.hide();
+            `;
+    });
+    parent.innerHTML = html;
   }
-  else{
-    toastr.warning('Atleast Select One Filter')
-  }
-   
-})
 
-//Clears the filter
-$("#clrFilter").on('click',()=>{
-    $('#courseNameFilter').val("")
-    $("#examDateFilter").val("")
-    courseQuery = "";
-    examDateQuery = "";
-    page =1
-    getRecordOnStatus();
-     $('#clrFilter').prop('disabled',true);
-})
+  //Populating the select tag in the Filter Modal
 
-// Gets the count for the statistics section
-async function getStats(){
-
+  async populateCourseFilter() {
     try {
-    
-        const enrollResponse = await fetch(`${ENROLL_API}?isDeleted=false`);
-        const enrollData = await enrollResponse.json();
-        
-        let pending = 0;
-        let approved = 0;
-        let rejected = 0;
-        
-        enrollData.forEach((e)=>{
-        if(e.status== "Pending"){
-            pending += 1;
-        }
-        else if(e.status=="Approved"){
-            approved += 1;
-        }
-        else if(e.status=="Rejected"){
-            rejected+=1;
-        }
-        
-        })
+      const data = await this.courseService.getCourse();
 
-        $('#enrollCount').text(enrollData.length);
-        $('#pendingCount').text(pending);
-        $('#rejectCount').text(rejected);
-        $('#approveCount').text(approved);
-        
-        $('#pendingBar').css('width',`${(pending*100/enrollData.length)}%`)
-        $('#rejectBar').css('width',`${(rejected*100/enrollData.length)}%`)
-        $('#approveBar').css('width',`${(approved*100/enrollData.length)}%`)
-        
-        const courseResponse = await fetch(COURSE_API);
-        const courseData = await courseResponse.json();
-        $('#courseCount').text(courseData.length)
-        
-        const studentResonse = await fetch(`${USER_API}?role=Student`)
-        const studentData  = await studentResonse.json();
-        $("#studentCount").text(studentData.length);
-
-        const centreResponse = await fetch(CENTRE_API);
-        const centreData = await centreResponse.json();
-        $("#centreCount").text(centreData.length);
-
-
-
+      this.renderCourseFilterOption(data);
     } catch (error) {
-        toastr.error(error.message)
+      toastr.error(error.message);
     }
-    
-     
-}
-getStats();
+  }
 
+  renderEnrollStats(data) {
+    $('#enrollCount').text(data.total);
+    $('#pendingCount').text(data.pending);
+    $('#rejectCount').text(data.rejected);
+    $('#approveCount').text(data.approved);
+  }
 
-// Populate details in the view Modal
-async function viewDetails(id){
-    
-     try {
-       
-        const response = await fetch(`${ENROLL_API}/${id}`);
-        const data = await response.json();
-        console.log(data);
-        $('#viewName').text(data.name)
-        $('#viewEmail').text(data.email)
-        $('#viewCourse').text(data.courseName)
-        $('#viewDept').text(data.deptName)
-        $('#viewFees').text(data.fees)
-        $('#viewCentre').text(data.centre)
-        $('#viewDate').text(dateFormat(data.preferredDate))
-        $('#viewStatus').text(data.status)
-        if(data.reason){
-        $('#viewReason').text(data.reason)
-        $('#reason').removeClass('d-none')
-        }
-        else{
-            $('#reason').addClass('d-none')
-        }   
+  renderEnrollStatsPercent(data) {
+    $('#pendingBar').css('width', `${data.pending}%`);
+    $('#rejectBar').css('width', `${data.rejected}%`);
+    $('#approveBar').css('width', `${data.approved}%`);
+  }
 
+  renderCourseStats(data) {
+    $('#courseCount').text(data.length);
+  }
 
+  renderStudentStats(data) {
+    $('#studentCount').text(data.length);
+  }
+
+  renderCentreStats(data) {
+    $('#centreCount').text(data.length);
+  }
+
+  // Gets the count for the statistics section
+
+  async getStats() {
+    try {
+      const enrollmentData = await this.enrollmentServices.getEnrollments({
+        isDeleted: false,
+      });
+      const courseData = await this.courseService.getCourse();
+      const studentData = await this.studentService.getStudentEnrollments({ role: 'Student' });
+      const centreData = await this.centreService.getCentre();
+
+      const enrollStats = this.statistics.calculateStats(enrollmentData);
+      this.renderEnrollStats(enrollStats);
+
+      const enrollStatsPercent = this.statistics.calculateStatsPercent(enrollStats);
+      this.renderEnrollStatsPercent(enrollStatsPercent);
+
+      this.renderCourseStats(courseData);
+      this.renderStudentStats(studentData);
+      this.renderCentreStats(centreData);
     } catch (error) {
-        toastr.error(error.message)
+      toastr.error(error.message);
     }
+  }
 
-    
-   
-}
-
-// Changing the Status to 'Approved'
-async function approveEnrollment(id){
-   
-     try {
-        
-        const sweetResponse = await  Swal.fire({
-        title: 'Are you sure you want to approve?',
-        icon: 'info',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33'
-        }) 
-
-        if(sweetResponse.isConfirmed){
-        const response = await fetch(`${ENROLL_API}/${id}`,{
-        method:"PATCH",
-        headers:{
-            'Content-Type':'application/json'
-        },
-        body:JSON.stringify({
-            status: "Approved",
-            updatedAt: new Date().toISOString().split('T')[0]
-        })
-        });
-        getRecordOnStatus();
-        getStats();
-            }
-         
-
+  // Populate details in the view Modal
+  async handleView(id) {
+    try {
+      const data = this.enrollmentServices.getEnrollment(id);
+      this.dashboardUtil.populateViewModal(data);
     } catch (error) {
-        toastr.error(error.message)
+      console.log(error);
     }
-  
-   
-  
-}
+  }
 
-let enrollIdForReject = "";
-
-// Changing the Status to 'Rejected' with Reason
-
-$('#rejectSubmit').on('click',async ()=>{
-   console.log($('#rejectReason').val());
-   if(!$('#rejectReason').val()){
-    toastr.warning('Empty field not allowed!');
-    return;
-   }
-
-   const sweetResponse = await  Swal.fire({
-    title: 'Are you sure you want to reject?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33'
-    }) 
-    if(sweetResponse.isConfirmed){
-         try {
-        const response = await fetch(`${ENROLL_API}/${enrollIdForReject}`,{
-        method:"PATCH",
-        headers:{
-            'Content-Type':'application/json'
-        },
-        body:JSON.stringify({
-            status: "Rejected",
-            reason: $("#rejectReason").val(),
-            updatedAt: new Date().toISOString().split('T')[0]
-        })
-        });
-        getRecordOnStatus();
-        rejectModal.hide();
-        getStats();
-            
-        } catch (error) {
-            toastr.error(error.message)
+  async handleApprove(id) {
+    try {
+      const approveConfirmation = await this.confiramationService.confirm(
+        'Are you sure you want to approve?'
+      );
+      if (approveConfirmation) {
+        const response = await this.enrollmentServices.applyEnrollment(id);
+        if (response.ok) {
+          this.getStats();
+          this.loadEnrollments();
         }
-        
+      }
+    } catch (error) {}
+  }
+
+  validateRejectForm() {
+    if (!$('#rejectReason').val()) {
+      toastr.warning('Empty field not allowed!');
+      return false;
+    }
+    return true;
+  }
+
+  // Changing the Status to 'Rejected' with Reason
+  async handleReject() {
+    try {
+      if (!this.validateRejectForm()) {
+        return;
+      }
+      const rejectConfirmation = await this.confiramationService.confirm(
+        'Are you sure you want to reject?',
+        'warning'
+      );
+      if (rejectConfirmation) {
+        const payload = { reason: $('#rejectReason').val() };
+        const response = await this.enrollmentServices.reapplyEnrollment(
+          this.currentEnrollId,
+          payload
+        );
+        if (response.ok) {
+          this.getStats();
+          this.loadEnrollments();
+          this.rejectModal.hide();
         }
-   
-   
-})
-
-// Deleting the record Permanently
-
-async function permanentDeleteRecord(id){
-    
-   try {
-    const sweetResponse = await  Swal.fire({
-    title: 'Are you sure you want to delete permanently ?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33'
-    }) 
-    if(sweetResponse.isConfirmed){
-        const response = await fetch(`${ENROLL_API}/${id}`,{
-        method:"DELETE",
-     });
-     getRecordOnStatus();
-     getStats();
+      }
+    } catch (error) {
+      toastr.error(error.message);
     }
-   } catch (error) {
-    
-   }
-   
-}
+  }
 
-// Restoring the record isDeleted = false
-
-async function restoreRecord(id){
-   const sweetResponse = await  Swal.fire({
-    title: 'Are you sure you want to restore?',
-    icon: 'info',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33'
-    }) 
-    if(sweetResponse.isConfirmed){
-        const response = await fetch(`${ENROLL_API}/${id}`,{
-        method:"PATCH",
-        headers:{
-            'Content-Type':'application/json'
-        },
-        body:JSON.stringify({
-            isDeleted:false,
-            updatedAt: new Date().toISOString().split('T')[0]
-        })
-     });
-     getRecordOnStatus();
-     getStats();
+  // Deleting the record Permanently
+  async handleDelete(id) {
+    try {
+      const deleteConfirmation = await this.confiramationService.confirm(
+        'Are you sure you want to delete permanently?',
+        'warning'
+      );
+      if (deleteConfirmation) {
+        const response = await this.enrollmentServices.deleteEnrollment(id);
+        if (response.ok) {
+          this.getStats();
+          this.loadEnrollments();
+        }
+      }
+    } catch (error) {
+      toastr.error(error.message);
     }
-}
+  }
 
-// Dynamically render the element in the DOM using a parent tag
+  // Restoring the record isDeleted = false
+  async handleRestore(id) {
+    const restoreConfirmation = await this.confiramationService.confirm(
+      'Are you sure you want to restore?'
+    );
+    if (restoreConfirmation) {
+      const response = await this.enrollmentServices.restoreEnrollment(id);
+      if (response.ok) {
+        this.getStats();
+        this.loadEnrollments();
+      }
+    }
+  }
 
-function renderElement(data){
+  determineStatusClass(status) {
+    switch (status) {
+      case 'Pending':
+        return 'text-warning bg-warning-subtle';
+      case 'Approved':
+        return 'text-success bg-success-subtle';
+      case 'Attended':
+        return 'text-info bg-info-subtle';
+      default:
+        return 'text-danger bg-danger-subtle';
+    }
+  }
+
+  determineDisabledState(status) {
+    return status === 'Pending' ? '' : 'disabled style="color:black; background-color:grey;"';
+  }
+
+  // Dynamically render the element in the DOM using a parent tag
+
+  renderEnrollments(data) {
     const parent = document.getElementById('parent');
-    parent.innerHTML = '';
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    let html = "";
-    data.forEach((e,i)=>{
-        const examDate = new Date(e.preferredDate);
-        examDate.setHours(0, 0, 0, 0);
-        const isExpired = examDate < today && e.status !== "Attended";
-        html += `
+    let html = '';
+    data.forEach((e, i) => {
+      const isExpired = this.dashboardUtil.checkExamExpiry(e.preferredDate, e.status);
+      html += `
         <tr>
-                  <td>${(page-1)*perPage+i+1}</td>
+                  <td>${(this.page - 1) * this.perPage + i + 1}</td>
                   <td>${e.name}</td>
                   <td>${e.courseName}</td>
                   <td>${e.centre}</td>
-                  <td>${dateFormat(e.preferredDate)}</td>
+                  <td>${this.dashboardUtil.dateFormat(e.preferredDate)}</td>
                   <td class="align-items-center">
                   <div class="d-flex align-items-center justify-content-start gap-2">
                         <span class="
-                            text-${
-                                e.status === "Pending"
-                                    ? "warning"
-                                    : e.status === "Approved"
-                                    ? "success"
-                                    : e.status === "Attended"
-                                    ? "info"
-                                    : "danger"
-                            }
-                            bg-${
-                                e.status === "Pending"
-                                    ? "warning"
-                                    : e.status === "Approved"
-                                    ? "success"
-                                    : e.status === "Attended"
-                                    ? "info"
-                                    : "danger"
-                            }-subtle
-                            rounded-pill px-2 py-1 text-center">
+                            ${this.determineStatusClass(e.status)}
+                        ">
                             ${e.status}
                         </span>
 
                         ${
-                            isExpired
-                                ? `<i class="bi bi-exclamation-triangle-fill text-danger icon-tooltip"
+                          isExpired
+                            ? `<i class="bi bi-exclamation-triangle-fill text-danger icon-tooltip"
                  data-tooltip="Exam date has passed"></i>`
-                                : ""
+                            : ''
                         }
                     </div>
                   </td>
                   <td>
-                  <button class="btn btn-info btn-sm m-1 icon-tooltip"
+                  <button class="btn btn-info btn-sm m-1 icon-tooltip viewBtn"
                  data-tooltip="View"
                    data-bs-toggle="modal" 
                    data-bs-target="#viewModal"
-                   id="viewBtn"
+                   data-action="view"
                     data-id="${e.id}">
                    <i class="bi bi-eye" ></i>
                   </button>
-                  ${isDeleted?`
-                     <button class="btn  btn-sm m-1 icon-tooltip"
-                 data-tooltip="Restore" id="restoreBtn" data-id="${e.id}" >
+                  ${
+                    isDeleted
+                      ? `
+                     <button class="btn  btn-sm m-1 icon-tooltip restoreBtn"
+                 data-tooltip="Restore" 
+                 data-action="restore"
+                 data-id="${e.id}" >
                    <i class="bi bi-arrow-counterclockwise"></i>
                      </button>
-                     <button class="btn  btn-sm m-1 icon-tooltip"
+                     <button class="btn  btn-sm m-1 icon-tooltip permanentDeleteBtn"
                  data-tooltip="Delete Permanently" 
-                     id="permanentDeleteBtn"
+                     data-action="permanentDelete"
                      data-id="${e.id}">
                        <i class="bi bi-trash"></i>
                      </button>
                     
                     
-                    `:` <button class="btn  btn-sm m-1 icon-tooltip"
-                 data-tooltip="Approve" ${e.status=="Pending"?``:`style="color:black; background-color:grey;" disabled`} 
-                  id="approveBtn"
+                    `
+                      : ` <button class="btn  btn-sm m-1 icon-tooltip approveBtn"
+                 data-tooltip="Approve" ${this.determineDisabledState(e.status)} 
+                  data-action="approve"
                   data-id="${e.id}">
                    <i class="bi bi-check-circle"></i>
                   </button>
                   
-                    <button class="btn  btn-sm m-1 icon-tooltip"
-                 data-tooltip="Reject" ${e.status=="Pending"?``:`style="color:black; background-color:grey;" disabled`} 
+                    <button class="btn  btn-sm m-1 icon-tooltip rejectBtn"
+                 data-tooltip="Reject" ${this.determineDisabledState(e.status)} 
                   data-bs-toggle="modal"
                   data-bs-target="#rejectModal"
-                  id="rejectBtn"
+                  data-action="reject"
                   data-id="${e.id}">
                    <i class="bi bi-x-circle"></i>
                   </button>
 
-                  
-
-                  `}
-                 
-                
-                  
+                  `
+                  }
                   </td>
-
                  </tr>
-        
-        `
-  
-    })
+        `;
+    });
     parent.innerHTML = html;
-    
+  }
 
-}
-
-// Used eventlisteners to get the 'id' from the dynamically rendered elements 
-// onclick = "" cannot be used since the js type is 'module'
- 
-document.addEventListener('click',(e)=>{
-        if(e.target.closest('#viewBtn')){
-           viewDetails(e.target.closest('#viewBtn').dataset.id)
-        }    
-
-        if(e.target.closest('#approveBtn')){
-           approveEnrollment(e.target.closest('#approveBtn').dataset.id)
-        } 
-
-        if(e.target.closest('#rejectBtn')){
-           enrollIdForReject = e.target.closest('#rejectBtn').dataset.id;
-        }  
-
-        if(e.target.closest('#permanentDeleteBtn')){
-           permanentDeleteRecord(e.target.closest('#permanentDeleteBtn').dataset.id);
-        }
-
-        if(e.target.closest('#restoreBtn')){
-           restoreRecord(e.target.closest('#restoreBtn').dataset.id);
-        } 
-})
-
-
-
-
-// Uses the filter sttate variable and URLSearchParams() to get the data
-async function getRecordOnStatus() {
-     
-    const params = new URLSearchParams();
-
-    params.append('_sort','-updatedAt');
-    
-    if(status){
-       params.append('status',status)
+  buildQuery() {
+    const params = {};
+    params._sort = '-updatedAt';
+    params.isDeleted = this.isDeleted;
+    if (this.status) {
+      params.status = this.status;
     }
-
-    if(searchQuery){
-        params.append('name:startsWith',searchQuery);
+    if (this.searchQuery) {
+      params['name:startsWith'] = this.searchQuery;
     }
-    
-    if(courseQuery){
-        params.append('courseName',courseQuery)
+    if (this.courseQuery) {
+      params.courseName = this.courseQuery;
     }
-
-    if(examDateQuery){
-        params.append("preferredDate",examDateQuery);
+    if (this.examDateQuery) {
+      params.preferredDate = this.examDateQuery;
     }
-    
-    params.append('isDeleted',isDeleted);
+    params._page = this.page;
+    params._per_page = this.perPage;
+    return params;
+  }
 
-    params.append('_page',page);
-    params.append('_per_page',perPage);
+  loadEnrollments() {
+    const params = this.buildQuery();
+    const data = this.enrollmentServices.getEnrollments(params);
+    this.renderEnrollments(data.data);
+    this.totalPages = data.pages;
+  }
 
-    const response = await fetch(`${ENROLL_API}?${params}`);
-    const data = await response.json();
-    totalPages = data.pages;
-    renderElement(data.data);
-}
+  setBtnState(status) {
+    this.status = status;
+    $('#allBtn, #apprBtn, #pendBtn, #rejBtn').removeClass('btn-pink-gradient');
+    const btnId = {
+      '': '#allBtn',
+      Approved: '#apprBtn',
+      Pending: '#pendBtn',
+      Rejected: '#rejBtn',
+    };
+    $(btnId[status]).addClass('btn-pink-gradient');
+    $('#attendedBtn').removeClass('btn-blue');
+    this.resetPagination();
+    this.loadEnrollments();
+  }
 
-getRecordOnStatus();
-
-//Pagination
-
-$('#pageNum').text(page);
-
-$("#nextPage").on('click',()=>{
-    if(page < totalPages){
-    page+=1;
-    $('#pageNum').text(page);
-    
-    getRecordOnStatus();
-    }
-})
-
-$("#prevPage").on('click',()=>{
-    if(page>1){
-    page-=1;
-    $('#pageNum').text(page);
-   
-    getRecordOnStatus();
-    }
-})
-
-$('#searchInput').on('input',function(){
-    page=1
-     $('#pageNum').text(page);
-    searchQuery = $('#searchInput').val();
-   
-    getRecordOnStatus();
-    
-})
-
-
-// Button CSS State Management
-
-function btnState(add,rem1,rem2,rem3){
-    $(add).addClass('btn-pink-gradient');
-    $(rem1).removeClass('btn-pink-gradient');
-    $(rem2).removeClass('btn-pink-gradient');
-    $(rem3).removeClass('btn-pink-gradient');
-    $("#attendedBtn").removeClass('btn-blue')
-}
-
-$('#allBtn,#enrollmentCard').on('click', ()=>{
-    page = 1
-     $('#pageNum').text(page);
-    btnState('#allBtn','#apprBtn','#pendBtn','#rejBtn');
-    status = "";
-    getRecordOnStatus();
-})
-
-$('#apprBtn,#approveCard').on('click',()=>{
-    page = 1
-     $('#pageNum').text(page);
-    btnState('#apprBtn','#allBtn','#pendBtn','#rejBtn');
-    status = 'Approved'
-    getRecordOnStatus()
-
-})
-
-$('#pendBtn,#pendCard').on('click',()=>{
-    page=1
-     $('#pageNum').text(page);
-    btnState('#pendBtn','#allBtn','#apprBtn','#rejBtn');
-    status = 'Pending';
-    getRecordOnStatus();
-})
-
-$('#rejBtn,#rejectCard').on('click',()=>{
-    page=1
-     $('#pageNum').text(page);
-    btnState('#rejBtn','#allBtn','#pendBtn','#apprBtn');
-    
-    status = 'Rejected'
-
-    
-    getRecordOnStatus();
-})
-
-
-$('#deletedBtn').on('click',function(){
-    page =1 ;
-    if(status=="Attended"){
-        status="";
-        btnState('#allBtn','#apprBtn','#pendBtn','#rejBtn');
-    }
-    if(!isDeleted){
-        isDeleted = true;
-    }
-    else{
-        isDeleted = false;
-    }
-    $("#attendedBtn").removeClass('btn-blue');
-    getRecordOnStatus();
-    $(this).toggleClass('btn-blue');
-})
-
-$('#attendedBtn').on('click',function(){
-    page=1;
-     $('#pageNum').text(page);
-    $("#deletedBtn").removeClass('btn-blue');
-    $(this).toggleClass('btn-blue');
-    isDeleted = false;
-    if(status == "Attended"){
-        status="";
-        $('#allBtn').addClass('btn-pink-gradient');
-    }
-    else{
-        status="Attended";
-        $('#allBtn').removeClass('btn-pink-gradient');
-    }
-     $('#apprBtn').removeClass('btn-pink-gradient');
-    $('#pendBtn').removeClass('btn-pink-gradient');
-    $('#rejBtn').removeClass('btn-pink-gradient');
-    
-    getRecordOnStatus();
-
-});
-
-
-
-// Clicking Course card will redirect to coursePage.html
-$('#courseCard').on('click',()=>{
-     window.location.assign('../pages/coursesPage.html');
-})
-
-
-// Clicking Centre card will render Centre data dynamically
-$('#centreCard').on('click',async ()=>{
-    const resposne = await fetch(CENTRE_API); 
-    const data = await resposne.json();
+  renderCentre(data) {
     const parent = document.getElementById('centreParent');
-    parent.innerHTML ="";
-    let html ="";
-    data.forEach((e)=>{
-      html+= `
+
+    let html = '';
+    data.forEach((e) => {
+      html += `
       <div class="shadow-sm px-3 d-flex align-items-center py-2 rounded-3 my-2 border border-2">
                  <h5 class="mb-0 text-pink"><span class="bi bi-building me-2 text-navy"></span>${e.centreName}</h5>
               </div>
       
-      `
-    })
+      `;
+    });
     parent.innerHTML = html;
-})
+  }
 
-// Clicking Student card will redirect to userPage.html
+  init() {
+    this.dashboardUtil.toastrConfig();
+    this.dashboardUtil.renderUserDetail(this.user[0]);
+    this.dashboardUtil.setUsername(this.user[0]);
+    this.dashboardUtil.logoutService();
+    this.populateCourseFilter();
+    this.getStats();
+    this.setupEvents();
+    this.loadEnrollments();
+    $('#pageNum').text(this.page);
+  }
+}
 
-$('#studentCard').on('click',()=>{
-     window.location.assign('../pages/userPage.html');
-})
+const dashboard = new AdminDashboard();
+dashboard.init();

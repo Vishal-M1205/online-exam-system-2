@@ -102,4 +102,70 @@ export class EnrollmentServices {
       console.log(error);
     }
   }
+
+  async approveEnrollment(id) {
+    try {
+      const response = await fetch(`${ENROLL_API}/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'Approved',
+          updatedAt: new Date().toISOString().split('T')[0],
+        }),
+      });
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async rejectEnrollment(id, payload) {
+    try {
+      const response = await fetch(`${ENROLL_API}/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'Rejected',
+          ...payload,
+          updatedAt: new Date().toISOString().split('T')[0],
+        }),
+      });
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async deleteEnrollment(id) {
+    try {
+      const response = await fetch(`${ENROLL_API}/${id}`, {
+        method: 'DELETE',
+      });
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async restoreEnrollment(id) {
+    try {
+      const response = await fetch(`${ENROLL_API}/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          isDeleted: false,
+          updatedAt: new Date().toISOString().split('T')[0],
+        }),
+      });
+      return response;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

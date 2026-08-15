@@ -1,4 +1,12 @@
+import { ConfirmationService } from './ConfirmationService.js';
+
 export class DashboardUtils {
+  constructor() {
+    this.confirmationService = new ConfirmationService();
+  }
+  getUserData() {
+    return JSON.parse(localStorage.getItem('user'));
+  }
   renderUserDetail(userData) {
     const user = userData;
 
@@ -44,5 +52,27 @@ export class DashboardUtils {
     } else {
       $('#reason').addClass('d-none');
     }
+  }
+
+  toastrConfig() {
+    //toastr Configuration
+    toastr.options = {
+      positionClass: 'toast-bottom-right',
+      showDuration: '300',
+      preventDuplicates: true,
+    };
+  }
+
+  logoutService() {
+    $('#logoutBtn').on('click', async () => {
+      const response = await this.confirmationService.confirm(
+        'Are you sure you want to logout?',
+        'warning'
+      );
+      if (response) {
+        window.location.replace('../pages/index.html');
+        localStorage.removeItem('user');
+      }
+    });
   }
 }

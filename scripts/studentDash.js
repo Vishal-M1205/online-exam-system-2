@@ -3,15 +3,18 @@ import { CourseService } from './services/CousreService.js';
 import { CentreService } from './services/CentreService.js';
 import { ConfirmationService } from './utils/ConfirmationService.js';
 import { DashboardUtils } from './utils/DashboardUtils.js';
+import { Statistics } from './utils/Statistics.js';
 class StudentDashboard {
   constructor() {
-    //  Logged IN used detail
-    this.user = JSON.parse(localStorage.getItem('user'));
     this.enrollmentServices = new EnrollmentServices();
     this.courseService = new CourseService();
     this.centreService = new CentreService();
     this.confirmationService = new ConfirmationService();
     this.dashboardUtils = new DashboardUtils();
+    this.statistics = new Statistics();
+
+    //  Logged IN used detail
+    this.user = this.dashboardUtils.getUserData();
 
     // To track the current user updating the enrollment
     this.currentUpdateId = null;
@@ -35,46 +38,14 @@ class StudentDashboard {
     this.filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
   }
 
-  calculateStats(enrollments) {
-    const stats = enrollments.reduce(
-      (result, e) => {
-        switch (e.status) {
-          case 'Pending':
-            result.pending++;
-            break;
-          case 'Approved':
-            result.approved++;
-            break;
-          case 'Rejected':
-            result.rejected++;
-            break;
-        }
-        return result;
-      },
-      {
-        pending: 0,
-        approved: 0,
-        rejected: 0,
-      }
-    );
-    return stats;
-  }
-
-  renderStats(status, total) {
-    $('#enrollCount').text(total);
-    $('#pendingCount').text(status.pending);
-    $('#rejectCount').text(status.rejected);
-    $('#approveCount').text(status.approved);
-  }
-
   async getStats() {
     try {
       const enrollments = await this.enrollmentServices.getEnrollments({
         userId: this.user[0].id,
         isDeleted: false,
       });
-      const stats = this.calculateStats(enrollments);
-      this.renderStats(stats, enrollments.length);
+      const stats = this.statistics.calculateStats(enrollments);
+      this.renderStats(stats);
     } catch (error) {
       console.log(error);
     }
@@ -298,17 +269,6 @@ class StudentDashboard {
 
     $('#exploreCourseBtn').on('click', () => {
       window.location.assign('../pages/coursesPage.html');
-    });
-
-    $('#logoutBtn').on('click', async () => {
-      const response = await this.confirmationService.confirm(
-        'Are you sure you want to logout?',
-        'warning'
-      );
-      if (response) {
-        window.location.replace('../pages/index.html');
-        localStorage.removeItem('user');
-      }
     });
   }
 
@@ -708,10 +668,12 @@ class StudentDashboard {
   }
 
   init() {
+    this.dashboardUtils.toastrConfig();
     this.dashboardUtils.renderUserDetail(this.user[0]);
     this.getStats();
     this.loadEnrollment();
     this.dashboardUtils.setUsername(this.user[0]);
+    this.dashboardUtils.logoutService();
     this.setupEvents();
     this.loadEnrollDetails();
   }

@@ -50,6 +50,12 @@ class StudentDashboard {
       console.log(error);
     }
   }
+  renderStats(stats) {
+    $('#enrollCount').text(stats.total);
+    $('#approveCount').text(stats.approved);
+    $('#rejectCount').text(stats.rejected);
+    $('#pendingCount').text(stats.pending);
+  }
 
   buildQuery() {
     const params = {
@@ -226,7 +232,7 @@ class StudentDashboard {
       this.submitUpdate();
     });
 
-    $('#enrollApplyBtn').on('submit', (e) => {
+    $('#enrollForm').on('submit', (e) => {
       e.preventDefault();
       this.applyEnrollment();
     });
@@ -270,6 +276,25 @@ class StudentDashboard {
     $('#exploreCourseBtn').on('click', () => {
       window.location.assign('../pages/coursesPage.html');
     });
+
+    $('#enrollBtn').on('click', () => {
+      this.handleEnroll();
+    });
+  }
+
+  async handleEnroll() {
+    const coursedata = await this.courseService.getCourse();
+    $('#course')
+      .off('change')
+      .on('change', function () {
+        const id = $(this).find(':selected').data('id');
+        if (id) {
+          const fees = coursedata.filter((c) => c.courseId == id);
+          $('#fees').val(fees[0].fees);
+        } else {
+          $('#fees').val('');
+        }
+      });
   }
 
   async handleView(id) {
@@ -370,7 +395,7 @@ class StudentDashboard {
         return;
       }
       const courseName = $('#updateCourse').find(':selected').val();
-      if (await this.checkDuplicateEnrollment(id, courseName)) {
+      if (await this.checkDuplicateEnrollment(courseName, id)) {
         return;
       }
 
@@ -421,7 +446,7 @@ class StudentDashboard {
     $('#updateExamDate').attr('min', new Date().toISOString().split('T')[0]);
   }
 
-  setupCourseFeeListener(coursedata) {
+  setupUpdateFormCourseFeeListener(coursedata) {
     $('#updateCourse')
       .off('change')
       .on('change', function () {
@@ -449,7 +474,7 @@ class StudentDashboard {
     return true;
   }
 
-  async checkDuplicateEnrollment(id = null, courseName) {
+  async checkDuplicateEnrollment(courseName, id = null) {
     const checkData = await this.enrollmentServices.getEnrollments({
       userId: this.user[0].id,
       isDeleted: false,
@@ -494,7 +519,7 @@ class StudentDashboard {
     try {
       const data = await this.loadUpdateData(id);
       this.populateUpdateForm(data);
-      this.setupCourseFeeListener(data.courseData);
+      this.setupUpdateFormCourseFeeListener(data.courseData);
       this.currentUpdateId = id;
     } catch (error) {
       console.log(error);

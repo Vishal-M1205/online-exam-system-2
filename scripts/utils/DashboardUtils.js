@@ -75,4 +75,10 @@ export class DashboardUtils {
       }
     });
   }
+
+  backToPreviousPage() {
+    $('#backBtn').on('click', () => {
+      window.history.back();
+    });
+  }
 }

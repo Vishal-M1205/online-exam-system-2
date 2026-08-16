@@ -1,37 +1,28 @@
-import {COURSE_API,USER_API,CENTRE_API,ENROLL_API} from '../scripts/api.js';
+import { DashboardUtils } from './utils/DashboardUtils.js';
+import { StudentService } from './services/StudentService.js';
 
-const userDetails = JSON.parse(localStorage.getItem('user'));
+class UserPage {
+  constructor() {
+    this.dashboardUtil = new DashboardUtils();
+    this.studentService = new StudentService();
 
-$('#userName').text(userDetails[0].name.split(' ')[0]);
+    this.user = this.dashboardUtil.getUserData();
+  }
 
-//Logout Button
-$('#logoutBtn').on('click',async ()=>{
-  const response = await  Swal.fire({
-    title: 'Are you sure you want to logout?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33'
-    }) 
-
-    if(response.isConfirmed){
-        window.location.replace('../pages/index.html');
-        localStorage.removeItem('user');
+  async loadUser() {
+    try {
+      const data = await this.studentService.getStudentEnrollments({ role: 'Student' });
+      this.renderCourseElement(data);
+    } catch (error) {
+      toastr.error(error.message);
     }
-})
+  }
 
-// Back to the previous Page
-$("#backBtn").on('click',()=>{
-    window.history.back();
-})
-
-// Rener Element in the DOM
-async function renderCourseElement(data) {
+  renderCourseElement(data) {
     const parent = document.getElementById('userParent');
-    parent.innerHTML = '';
-    let html = "";
-    data.forEach((e)=>{
-        html += `
+    let html = '';
+    data.forEach((e) => {
+      html += `
         <div class="col-lg-6">
     <div class="card shadow-sm border-0 h-100">
         <div class="card-header bg-pink text-white">
@@ -81,30 +72,25 @@ async function renderCourseElement(data) {
                     <p class="mb-0 fw-bold">${e.departmentName}</p>
                 </div>
 
-                
-
             </div>
         </div>
-    </div>
-</div>
-        `
-  
-    })
+      </div>
+   </div>
+        `;
+    });
     parent.innerHTML = html;
+  }
+  init() {
+    this.dashboardUtil.toastrConfig();
+    this.dashboardUtil.renderUserDetail(this.user[0]);
+    this.dashboardUtil.setUsername(this.user[0]);
+    this.dashboardUtil.logoutService();
+    this.dashboardUtil.backToPreviousPage();
+    this.loadUser();
+  }
 }
 
+const userPage = new UserPage();
+userPage.init();
 
-async function getUser() {
-
-   try {
-    const response = await fetch(`${USER_API}?role=Student`);
-    const data = await response.json();
-    renderCourseElement(data); 
-    } catch (error) {
-        toastr.error(error.message)
-    }
-  
-} 
-getUser();
-
-
+// Rener Element in the DOM

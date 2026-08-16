@@ -1,4 +1,3 @@
-import { COURSE_API, USER_API, CENTRE_API, ENROLL_API } from '../scripts/api.js';
 import { DashboardUtils } from './utils/DashboardUtils.js';
 import { CourseService } from './services/CousreService.js';
 import { EnrollmentServices } from './services/EnrollmentServices.js';
@@ -17,7 +16,7 @@ class AdminDashboard {
     this.centreService = new CentreService();
     this.confiramationService = new ConfirmationService();
 
-    this.user = this.dashboardUtils.getUserData();
+    this.user = this.dashboardUtil.getUserData();
 
     this.currentEnrollId = null;
 
@@ -108,7 +107,7 @@ class AdminDashboard {
       }
     });
 
-    $('#searchInput').on('input', function () {
+    $('#searchInput').on('input', () => {
       this.page = 1;
       $('#pageNum').text(this.page);
       this.searchQuery = $('#searchInput').val();
@@ -147,13 +146,13 @@ class AdminDashboard {
       }
 
       this.loadEnrollments();
-      $(this).toggleClass('btn-blue');
+      $('#deletedBtn').toggleClass('btn-blue');
     });
 
     $('#attendedBtn').on('click', () => {
       this.resetPagination();
       $('#deletedBtn').removeClass('btn-blue');
-      $(this).toggleClass('btn-blue');
+      $('#attendedBtn').toggleClass('btn-blue');
       this.isDeleted = false;
       if (this.status == 'Attended') {
         this.status = '';
@@ -166,7 +165,7 @@ class AdminDashboard {
       $('#pendBtn').removeClass('btn-pink-gradient');
       $('#rejBtn').removeClass('btn-pink-gradient');
 
-      getRecordOnStatus();
+      this.loadEnrollments();
     });
 
     $('#centreCard').on('click', async () => {
@@ -264,7 +263,7 @@ class AdminDashboard {
   // Populate details in the view Modal
   async handleView(id) {
     try {
-      const data = this.enrollmentServices.getEnrollment(id);
+      const data = await this.enrollmentServices.getEnrollment(id);
       this.dashboardUtil.populateViewModal(data);
     } catch (error) {
       console.log(error);
@@ -277,7 +276,7 @@ class AdminDashboard {
         'Are you sure you want to approve?'
       );
       if (approveConfirmation) {
-        const response = await this.enrollmentServices.applyEnrollment(id);
+        const response = await this.enrollmentServices.approveEnrollment(id);
         if (response.ok) {
           this.getStats();
           this.loadEnrollments();
@@ -306,7 +305,7 @@ class AdminDashboard {
       );
       if (rejectConfirmation) {
         const payload = { reason: $('#rejectReason').val() };
-        const response = await this.enrollmentServices.reapplyEnrollment(
+        const response = await this.enrollmentServices.rejectEnrollment(
           this.currentEnrollId,
           payload
         );
@@ -411,7 +410,7 @@ class AdminDashboard {
                    <i class="bi bi-eye" ></i>
                   </button>
                   ${
-                    isDeleted
+                    this.isDeleted
                       ? `
                      <button class="btn  btn-sm m-1 icon-tooltip restoreBtn"
                  data-tooltip="Restore" 
@@ -474,9 +473,9 @@ class AdminDashboard {
     return params;
   }
 
-  loadEnrollments() {
+  async loadEnrollments() {
     const params = this.buildQuery();
-    const data = this.enrollmentServices.getEnrollments(params);
+    const data = await this.enrollmentServices.getEnrollments(params);
     this.renderEnrollments(data.data);
     this.totalPages = data.pages;
   }

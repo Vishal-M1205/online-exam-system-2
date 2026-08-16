@@ -1,40 +1,28 @@
-import {COURSE_API,USER_API,CENTRE_API,ENROLL_API} from '../scripts/api.js';
+import { DashboardUtils } from './utils/DashboardUtils.js';
+import { CourseService } from './services/CousreService.js';
 
-const userDetails = JSON.parse(localStorage.getItem('user'));
+class CoursePage {
+  constructor() {
+    this.dashboardUtil = new DashboardUtils();
+    this.courseService = new CourseService();
 
-//Setting user name in the navbar
-$('#userName').text(userDetails[0].name.split(' ')[0]);
+    this.user = this.dashboardUtil.getUserData();
+  }
 
-
-//logout button in the navbar
-$('#logoutBtn').on('click',async ()=>{
-  const response = await  Swal.fire({
-    title: 'Are you sure you want to logout?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33'
-    }) 
-
-    if(response.isConfirmed){
-        window.location.replace('../pages/index.html');
-        localStorage.removeItem('user');
+  async loadCourses() {
+    try {
+      const data = await this.courseService.getCourse();
+      this.renderCourseElement(data);
+    } catch (error) {
+      toastr.error(error.message);
     }
-})
+  }
 
-
-// Redirect to the previous page
-$("#backBtn").on('click',()=>{
-    window.history.back();
-})
-
-//Render the course details dynamically in the DOM
-async function renderCourseElement(data) {
+  renderCourseElement(data) {
     const parent = document.getElementById('courseParent');
-    parent.innerHTML = '';
-    let html = "";
-    data.forEach((e)=>{
-        html += `
+    let html = '';
+    data.forEach((e) => {
+      html += `
            <div class="col-md-4 ">
     <div class="card h-100 shadow-sm border-pink ">
         <img
@@ -63,23 +51,18 @@ async function renderCourseElement(data) {
         </div>
     </div>
 </div>
-        `
-  
-    })
+        `;
+    });
     parent.innerHTML = html;
+  }
+
+  init() {
+    this.dashboardUtil.setUsername(this.user[0]);
+    this.dashboardUtil.logoutService();
+    this.dashboardUtil.backToPreviousPage();
+    this.loadCourses();
+  }
 }
 
-//Fetching the Course Data
-async function getCourse() {
-    try {
-         const response = await fetch(COURSE_API);
-  const data = await response.json();
-  renderCourseElement(data); 
-    } catch (error) {
-        toastr.error(error.message)
-    }
-  
-} 
-getCourse();
-
-
+const coursePage = new CoursePage();
+coursePage.init();

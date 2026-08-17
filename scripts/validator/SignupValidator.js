@@ -1,4 +1,5 @@
 import { StudentService } from '../services/StudentService.js';
+import bcrypt from 'https://cdn.jsdelivr.net/npm/bcryptjs@3.0.2/+esm';
 
 export class SignupValidator {
   constructor() {
@@ -57,13 +58,17 @@ export class SignupValidator {
     $('#dob').prop('max', dobDate.toISOString().split('T')[0]);
   }
 
-  checkDuplicateEmail(email) {
-    const emailCheck = this.studentService.getStudentByEmail(email);
-    console.log(emailCheck);
-    if (emailCheck.responseText) {
+  async hashPassword(password) {
+    return await bcrypt.hash(password, 10);
+  }
+
+  async checkDuplicateEmail(email) {
+    const emailCheck = await this.studentService.getStudentByEmail(email);
+
+    if (emailCheck[0]?.email === email) {
       toastr.error('Email Already Exists');
-      return false;
+      return true;
     }
-    return true;
+    return false;
   }
 }

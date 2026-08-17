@@ -3,7 +3,7 @@
     {
       "name": "Vishal M",
       "email": "visowmani.123@gmail.com",
-      "password": "Vishal@1205",
+      "password": "$2b$10$5FT5iR66WDpU7c9OSSRpAeM9y865iCZXtAPuwO2bZUsSZNAYwhBG.",
       "dob": "2005-11-12",
       "gender": "Male",
       "college": null,
@@ -15,7 +15,7 @@
     {
       "name": "Harish B",
       "email": "harish.123@gmail.com",
-      "password": "Harish@123",
+      "password": "$2b$10$sDPQs.U9O8qoV2mOTZrb7uRjb2d4uyaJg0fIFc.0iIiCs2QNJ4bEW",
       "dob": "2005-06-27",
       "gender": "Male",
       "college": "Sri Krishna Arts and Science College",
@@ -27,7 +27,7 @@
     {
       "name": "Arun M",
       "email": "arun@gmail.com",
-      "password": "Arun@123",
+      "password": "$2b$10$su4zE.K9HGPPgzpo.fOlF.mdHuJVPhEmKoxkR6Ar.8Ikn5Gr7Adfi",
       "dob": "2005-02-08",
       "gender": "Male",
       "college": "Sri Krishna Arts and Science College",
@@ -39,7 +39,7 @@
     {
       "name": "Sanjay",
       "email": "sanjay05@gmail.com",
-      "password": "Sanjay@2005",
+      "password": "$2b$10$jvifgHQ6BlxrWPx3W8E3t.K6aBSMkcX7RMcjZthp.UmtcEIw46NrO",
       "dob": "2005-07-23",
       "gender": "Male",
       "college": "Sri Krishna Arts and Science College",
@@ -49,40 +49,16 @@
       "id": "gD0A9wVilBI"
     },
     {
-      "name": "asddas",
+      "name": "Vishal Manivannan",
       "email": "xyzqwe@gmail.com",
-      "password": "Arun@123",
-      "dob": "2009-07-29",
+      "password": "$2b$10$V5Kjjc/2v6L1c99mXKU2.egNgbNkz31QUbaaWC5To4ex1aFkY6NTC",
+      "dob": "2009-08-05",
       "gender": "Male",
-      "college": "dsasda",
+      "college": "Sri Krishna Arts and Science College",
       "departmentName": "Information Technology",
       "mobile": "0637954313",
       "role": "Student",
-      "id": "SzxDfVbg0Qs"
-    },
-    {
-      "name": "asddas",
-      "email": "xyzqwe@gmail.com",
-      "password": "Arun@123",
-      "dob": "2009-07-29",
-      "gender": "Male",
-      "college": "dsasda",
-      "departmentName": "Information Technology",
-      "mobile": "0637954313",
-      "role": "Student",
-      "id": "IvxUmPD4pgA"
-    },
-    {
-      "name": "xcvv",
-      "email": "xyzqwe@gmail.com",
-      "password": "Arun@123",
-      "dob": "2009-08-12",
-      "gender": "Male",
-      "college": "czxczx",
-      "departmentName": "Information Technology",
-      "mobile": "0637954313",
-      "role": "Student",
-      "id": "JY_nlTlyyPA"
+      "id": "qUgWEjSIHQg"
     }
   ],
   "course": [
@@ -335,10 +311,10 @@
       "centreId": 1,
       "centre": "Coimbatore",
       "preferredDate": "2026-08-22",
-      "status": "Pending",
-      "reason": "",
+      "status": "Rejected",
+      "reason": "No seat",
       "createdAt": "2026-06-29",
-      "updatedAt": "2026-08-16",
+      "updatedAt": "2026-08-17",
       "isDeleted": false,
       "id": "gWWLJ4IpBbs"
     },

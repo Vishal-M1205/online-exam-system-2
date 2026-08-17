@@ -1,3 +1,5 @@
+import bcrypt from 'https://cdn.jsdelivr.net/npm/bcryptjs@3.0.2/+esm';
+
 export class LoginValidator {
   validateLoginForm() {
     const validator = $('#login-form').validate({
@@ -16,8 +18,9 @@ export class LoginValidator {
     return validator.form();
   }
 
-  validatePassword(data, password) {
-    if (!(data[0].password == password)) {
+  async validatePassword(data, password) {
+    const isValid = await bcrypt.compare(password, data[0].password);
+    if (!isValid) {
       toastr.error('Wrong Password');
       return false;
     }

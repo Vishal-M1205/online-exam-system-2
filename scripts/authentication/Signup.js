@@ -28,10 +28,10 @@ export class Signup {
         return;
       }
       const email = $('#email').val().trim();
-      if (!this.signupValidator.checkDuplicateEmail(email)) {
+      if (await this.signupValidator.checkDuplicateEmail(email)) {
         return;
       }
-      const data = this.getSignupPayload();
+      const data = await this.getSignupPayload();
       const response = await this.studentService.createNewStudent(data);
       if (response.ok) {
         this.signupModal.hide();
@@ -42,11 +42,11 @@ export class Signup {
     }
   }
 
-  getSignupPayload() {
+  async getSignupPayload() {
     return {
       name: $('#name').val().trim(),
       email: $('#email').val().trim().toLowerCase(),
-      password: $('#pass').val().trim(),
+      password: await this.signupValidator.hashPassword($('#pass').val().trim()),
       dob: $('#dob').val(),
       gender: $('#male').prop('checked') ? 'Male' : 'Female',
       college: $('#college').val().trim(),

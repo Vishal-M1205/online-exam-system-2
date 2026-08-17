@@ -321,8 +321,8 @@ class StudentDashboard {
       'Are you sure you want to cancel the Application?'
     );
     if (confirmCancel) {
-      const resposne = await this.enrollmentServices.cancelEnrollment(id);
-      if (resposne.ok) {
+      const response = await this.enrollmentServices.cancelEnrollment(id);
+      if (response.ok) {
         this.loadEnrollment();
         this.getStats();
         toastr.success('Deleted Successfully');

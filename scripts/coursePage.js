@@ -9,6 +9,7 @@ class CoursePage {
     this.user = this.dashboardUtil.getUserData();
   }
 
+  // Fetches all courses from the service and renders them on the page
   async loadCourses() {
     try {
       const data = await this.courseService.getCourse();
@@ -18,6 +19,7 @@ class CoursePage {
     }
   }
 
+  // Dynamically renders course cards in the DOM with course details and pricing
   renderCourseElement(data) {
     const parent = document.getElementById('courseParent');
     let html = '';
@@ -56,6 +58,7 @@ class CoursePage {
     parent.innerHTML = html;
   }
 
+  // Initializes the course page with user details, logout handler, and course loading
   init() {
     this.dashboardUtil.setUsername(this.user[0]);
     this.dashboardUtil.logoutService();

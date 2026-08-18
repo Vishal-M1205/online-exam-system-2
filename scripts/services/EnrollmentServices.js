@@ -1,6 +1,7 @@
 import { ENROLL_API } from '../api.js';
 
 export class EnrollmentServices {
+  // Fetches all enrollments with optional filter parameters
   async getEnrollments(params) {
     try {
       const data = await $.get(ENROLL_API, params);
@@ -10,6 +11,7 @@ export class EnrollmentServices {
     }
   }
 
+  // Retrieves a specific enrollment record by its ID
   async getEnrollment(id) {
     try {
       const data = await fetch(`${ENROLL_API}/${id}`);
@@ -19,6 +21,7 @@ export class EnrollmentServices {
     }
   }
 
+  // Updates an enrollment record with the provided payload data
   async updateEnrollment(id, payload) {
     try {
       const response = await fetch(`${ENROLL_API}/${id}`, {
@@ -34,6 +37,7 @@ export class EnrollmentServices {
     }
   }
 
+  // Creates a new enrollment request with the provided student and course data
   async applyEnrollment(payload) {
     try {
       const response = await fetch(ENROLL_API, {
@@ -50,6 +54,7 @@ export class EnrollmentServices {
     }
   }
 
+  // Resubmits an enrollment request with updated information
   async reapplyEnrollment(id, payload) {
     try {
       const response = await fetch(`${ENROLL_API}/${id}`, {
@@ -66,6 +71,7 @@ export class EnrollmentServices {
     }
   }
 
+  // Cancels an enrollment by marking it as deleted
   async cancelEnrollment(id) {
     try {
       const response = await fetch(`${ENROLL_API}/${id}`, {
@@ -84,6 +90,7 @@ export class EnrollmentServices {
     }
   }
 
+  // Updates enrollment status to Attended after student takes the exam
   async attendedExam(id) {
     try {
       const response = await fetch(`${ENROLL_API}/${id}`, {
@@ -103,6 +110,7 @@ export class EnrollmentServices {
     }
   }
 
+  // Approves a pending enrollment request by updating its status
   async approveEnrollment(id) {
     try {
       const response = await fetch(`${ENROLL_API}/${id}`, {
@@ -121,6 +129,7 @@ export class EnrollmentServices {
     }
   }
 
+  // Rejects an enrollment request with optional rejection reason
   async rejectEnrollment(id, payload) {
     try {
       const response = await fetch(`${ENROLL_API}/${id}`, {
@@ -140,6 +149,7 @@ export class EnrollmentServices {
     }
   }
 
+  // Permanently deletes an enrollment record from the database
   async deleteEnrollment(id) {
     try {
       const response = await fetch(`${ENROLL_API}/${id}`, {
@@ -151,6 +161,7 @@ export class EnrollmentServices {
     }
   }
 
+  // Restores a previously deleted or cancelled enrollment record
   async restoreEnrollment(id) {
     try {
       const response = await fetch(`${ENROLL_API}/${id}`, {

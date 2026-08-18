@@ -7,6 +7,7 @@ import { Statistics } from './utils/Statistics.js';
 import { ConfirmationService } from './utils/ConfirmationService.js';
 
 class AdminDashboard {
+  // Initializes AdminDashboard with all required services, modals, and filter state variables
   constructor() {
     this.dashboardUtil = new DashboardUtils();
     this.courseService = new CourseService();
@@ -37,6 +38,7 @@ class AdminDashboard {
     this.filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
   }
 
+  // Attaches event listeners for enrollment actions, filters, pagination, and navigation buttons
   setupEvents() {
     $('#parent').on('click', '[data-action]', (e) => {
       const button = e.currentTarget;
@@ -182,11 +184,13 @@ class AdminDashboard {
     });
   }
 
+  // Resets pagination to page 1 and updates the page number display
   resetPagination() {
     this.page = 1;
     $('#pageNum').text(this.page);
   }
 
+  // Renders course options in the filter dropdown with course names
   renderCourseFilterOption(data) {
     const parent = document.getElementById('courseNameFilter');
     let html = `<option value="">Selected None</option>`;
@@ -198,8 +202,7 @@ class AdminDashboard {
     parent.innerHTML = html;
   }
 
-  //Populating the select tag in the Filter Modal
-
+  // Fetches all courses from service and populates the course filter dropdown
   async populateCourseFilter() {
     try {
       const data = await this.courseService.getCourse();
@@ -210,6 +213,7 @@ class AdminDashboard {
     }
   }
 
+  // Displays enrollment count statistics (total, pending, rejected, approved) in dashboard cards
   renderEnrollStats(data) {
     $('#enrollCount').text(data.total);
     $('#pendingCount').text(data.pending);
@@ -217,26 +221,29 @@ class AdminDashboard {
     $('#approveCount').text(data.approved);
   }
 
+  // Updates progress bar widths to display enrollment status percentages visually
   renderEnrollStatsPercent(data) {
     $('#pendingBar').css('width', `${data.pending}%`);
     $('#rejectBar').css('width', `${data.rejected}%`);
     $('#approveBar').css('width', `${data.approved}%`);
   }
 
+  // Displays total course count in the dashboard statistics section
   renderCourseStats(data) {
     $('#courseCount').text(data.length);
   }
 
+  // Displays total student count in the dashboard statistics section
   renderStudentStats(data) {
     $('#studentCount').text(data.length);
   }
 
+  // Displays total test centre count in the dashboard statistics section
   renderCentreStats(data) {
     $('#centreCount').text(data.length);
   }
 
-  // Gets the count for the statistics section
-
+  // Fetches and renders enrollment, course, student, and centre statistics for dashboard
   async getStats() {
     try {
       const enrollmentData = await this.enrollmentServices.getEnrollments({
@@ -260,7 +267,7 @@ class AdminDashboard {
     }
   }
 
-  // Populate details in the view Modal
+  // Retrieves enrollment details by ID and populates the view modal
   async handleView(id) {
     try {
       const data = await this.enrollmentServices.getEnrollment(id);
@@ -270,6 +277,7 @@ class AdminDashboard {
     }
   }
 
+  // Updates enrollment status to Approved after admin confirmation
   async handleApprove(id) {
     try {
       const approveConfirmation = await this.confiramationService.confirm(
@@ -285,6 +293,7 @@ class AdminDashboard {
     } catch (error) {}
   }
 
+  // Validates that a rejection reason has been provided in the reject form
   validateRejectForm() {
     if (!$('#rejectReason').val()) {
       toastr.warning('Empty field not allowed!');
@@ -293,7 +302,7 @@ class AdminDashboard {
     return true;
   }
 
-  // Changing the Status to 'Rejected' with Reason
+  // Updates enrollment status to Rejected with reason after admin confirmation
   async handleReject() {
     try {
       if (!this.validateRejectForm()) {
@@ -320,7 +329,7 @@ class AdminDashboard {
     }
   }
 
-  // Deleting the record Permanently
+  // Permanently removes enrollment record from database after confirmation
   async handleDelete(id) {
     try {
       const deleteConfirmation = await this.confiramationService.confirm(
@@ -339,7 +348,7 @@ class AdminDashboard {
     }
   }
 
-  // Restoring the record isDeleted = false
+  // Restores a deleted enrollment record by setting isDeleted flag to false
   async handleRestore(id) {
     const restoreConfirmation = await this.confiramationService.confirm(
       'Are you sure you want to restore?'
@@ -353,6 +362,7 @@ class AdminDashboard {
     }
   }
 
+  // Returns CSS classes for displaying enrollment status with appropriate color styling
   determineStatusClass(status) {
     switch (status) {
       case 'Pending':
@@ -366,12 +376,12 @@ class AdminDashboard {
     }
   }
 
+  // Returns disabled state HTML attributes based on enrollment status
   determineDisabledState(status) {
     return status === 'Pending' ? '' : 'disabled style="color:black; background-color:grey;"';
   }
 
-  // Dynamically render the element in the DOM using a parent tag
-
+  // Dynamically renders enrollment table rows in the DOM with action buttons based on status
   renderEnrollments(data) {
     const parent = document.getElementById('parent');
     let html = '';
@@ -452,6 +462,7 @@ class AdminDashboard {
     parent.innerHTML = html;
   }
 
+  // Constructs API query parameters based on current filter and pagination state
   buildQuery() {
     const params = {};
     params._sort = '-updatedAt';
@@ -473,6 +484,7 @@ class AdminDashboard {
     return params;
   }
 
+  // Fetches enrollments from API using built query parameters and renders them in table
   async loadEnrollments() {
     const params = this.buildQuery();
     const data = await this.enrollmentServices.getEnrollments(params);
@@ -480,6 +492,7 @@ class AdminDashboard {
     this.totalPages = data.pages;
   }
 
+  // Updates status filter, highlights active button, and reloads enrollment data
   setBtnState(status) {
     this.status = status;
     $('#allBtn, #apprBtn, #pendBtn, #rejBtn').removeClass('btn-pink-gradient');
@@ -495,6 +508,7 @@ class AdminDashboard {
     this.loadEnrollments();
   }
 
+  // Renders a list of test centres with their names in the modal
   renderCentre(data) {
     const parent = document.getElementById('centreParent');
 
@@ -510,6 +524,7 @@ class AdminDashboard {
     parent.innerHTML = html;
   }
 
+  // Initializes the admin dashboard with user data, statistics, filters, and event listeners
   init() {
     this.dashboardUtil.toastrConfig();
     this.dashboardUtil.renderUserDetail(this.user[0]);

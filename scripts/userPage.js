@@ -9,6 +9,7 @@ class UserPage {
     this.user = this.dashboardUtil.getUserData();
   }
 
+  // Fetches all students and renders their information on the page
   async loadUser() {
     try {
       const data = await this.studentService.getStudentEnrollments({ role: 'Student' });
@@ -18,6 +19,7 @@ class UserPage {
     }
   }
 
+  // Dynamically renders student details cards in the DOM with personal information
   renderCourseElement(data) {
     const parent = document.getElementById('userParent');
     let html = '';
@@ -80,6 +82,7 @@ class UserPage {
     });
     parent.innerHTML = html;
   }
+  // Initializes the user page with dashboard configuration and user data display
   init() {
     this.dashboardUtil.toastrConfig();
     this.dashboardUtil.renderUserDetail(this.user[0]);

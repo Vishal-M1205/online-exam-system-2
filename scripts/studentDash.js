@@ -5,6 +5,7 @@ import { ConfirmationService } from './utils/ConfirmationService.js';
 import { DashboardUtils } from './utils/DashboardUtils.js';
 import { Statistics } from './utils/Statistics.js';
 class StudentDashboard {
+  // Initializes StudentDashboard with all required services, modals, and filter state variables
   constructor() {
     this.enrollmentServices = new EnrollmentServices();
     this.courseService = new CourseService();
@@ -38,6 +39,7 @@ class StudentDashboard {
     this.filterModal = new bootstrap.Modal(document.getElementById('filterModal'));
   }
 
+  // Fetches enrollment statistics for current user and updates dashboard display
   async getStats() {
     try {
       const enrollments = await this.enrollmentServices.getEnrollments({
@@ -50,6 +52,7 @@ class StudentDashboard {
       console.log(error);
     }
   }
+  // Displays enrollment count statistics in dashboard cards
   renderStats(stats) {
     $('#enrollCount').text(stats.total);
     $('#approveCount').text(stats.approved);
@@ -57,6 +60,7 @@ class StudentDashboard {
     $('#pendingCount').text(stats.pending);
   }
 
+  // Constructs API query parameters based on filter and status state
   buildQuery() {
     const params = {
       userId: this.user[0].id,
@@ -82,6 +86,7 @@ class StudentDashboard {
     return params;
   }
 
+  // Returns CSS classes for displaying enrollment status with appropriate styling
   getStatusClass(status) {
     if (status === 'Approved') {
       return 'bg-success-subtle text-success';
@@ -94,6 +99,7 @@ class StudentDashboard {
     }
   }
 
+  // Returns HTML action button markup based on enrollment status
   getActionButton(id, status) {
     if (status === 'Pending') {
       return `
@@ -144,6 +150,7 @@ class StudentDashboard {
     return '';
   }
 
+  // Dynamically renders enrollment cards in the DOM with course details and action buttons
   renderEnrollment(enrollments) {
     const parent = document.getElementById('parent');
     parent.innerHTML = '';
@@ -193,6 +200,7 @@ class StudentDashboard {
     parent.innerHTML = html;
   }
 
+  // Fetches enrollments from API using query parameters and renders them
   async loadEnrollment() {
     try {
       const params = this.buildQuery();
@@ -203,6 +211,7 @@ class StudentDashboard {
     }
   }
 
+  // Attaches event listeners for enrollment actions, filters, and navigation buttons
   setupEvents() {
     $('#parent').on('click', '[data-action]', (e) => {
       const button = e.currentTarget;
@@ -282,6 +291,7 @@ class StudentDashboard {
     });
   }
 
+  // Sets up course dropdown change listener to update fees based on selected course
   async handleEnroll() {
     const coursedata = await this.courseService.getCourse();
     $('#course')
@@ -297,11 +307,13 @@ class StudentDashboard {
       });
   }
 
+  // Retrieves enrollment details by ID and populates the view modal
   async handleView(id) {
     const data = await this.enrollmentServices.getEnrollment(id);
     this.dashboardUtils.populateViewModal(data);
   }
 
+  // Updates enrollment status to Attended after student confirmation
   async handleAttended(id) {
     const confirmAttended = await this.confirmationService.confirm(
       'Are you sure you attended the exam?'
@@ -316,6 +328,7 @@ class StudentDashboard {
     }
   }
 
+  // Cancels enrollment by marking it as deleted after student confirmation
   async handleCancel(id) {
     const confirmCancel = await this.confirmationService.confirm(
       'Are you sure you want to cancel the Application?'
@@ -330,6 +343,7 @@ class StudentDashboard {
     }
   }
 
+  // Validates that reapply date is different from original application date
   validateReapplyDate() {
     if (this.reapplyDate == $('#reapplyDate').val()) {
       toastr.warning('Same Date Applied !');
@@ -338,6 +352,7 @@ class StudentDashboard {
     return true;
   }
 
+  // Constructs payload object for reapplying to a rejected enrollment
   getReapplyPayload() {
     return {
       preferredDate: $('#reapplyDate').val(),
@@ -347,6 +362,7 @@ class StudentDashboard {
     };
   }
 
+  // Submits reapplication request with new exam date after validation and confirmation
   async reapplyEnrollment() {
     if (!this.validateReapplyDate()) {
       return;
@@ -371,6 +387,7 @@ class StudentDashboard {
     }
   }
 
+  // Fetches enrollment data and prepares reapply modal for rejected enrollments
   async handleReapply(id) {
     try {
       const data = await this.enrollmentServices.getEnrollment(id);
@@ -382,11 +399,13 @@ class StudentDashboard {
     }
   }
 
+  // Sets the current date value and minimum date constraint in reapply date field
   setReapplyDate(data) {
     $('#reapplyDate').val(data.preferredDate);
     $('#reapplyDate').attr('min', new Date().toISOString().split('T')[0]);
   }
 
+  // Validates update form and submits enrollment update after confirmation
   async submitUpdate() {
     try {
       const id = this.currentUpdateId;
@@ -419,6 +438,7 @@ class StudentDashboard {
     }
   }
 
+  // Fetches course and enrollment data needed to populate update form
   async loadUpdateData(id) {
     const courseData = await this.courseService.getCourse();
 
@@ -430,6 +450,7 @@ class StudentDashboard {
     };
   }
 
+  // Fills update modal form fields with current enrollment data and fees
   populateUpdateForm(data) {
     const enrollment = data.enrollData;
     const course = data.courseData;
@@ -446,6 +467,7 @@ class StudentDashboard {
     $('#updateExamDate').attr('min', new Date().toISOString().split('T')[0]);
   }
 
+  // Attaches change listener to update course dropdown to display course fees
   setupUpdateFormCourseFeeListener(coursedata) {
     $('#updateCourse')
       .off('change')
@@ -460,6 +482,7 @@ class StudentDashboard {
       });
   }
 
+  // Validates that all required fields in update form are populated
   updateFormValidate() {
     if (!$('#updateCourse').find(':selected').data('id')) {
       toastr.warning('Empty Course Field !');
@@ -474,6 +497,7 @@ class StudentDashboard {
     return true;
   }
 
+  // Checks if student is already enrolled in the selected course
   async checkDuplicateEnrollment(courseName, id = null) {
     const checkData = await this.enrollmentServices.getEnrollments({
       userId: this.user[0].id,
@@ -488,6 +512,7 @@ class StudentDashboard {
     return false;
   }
 
+  // Constructs payload object with updated enrollment details from form
   getUpdatePayload() {
     const course = $('#updateCourse').find(':selected');
     const centre = $('#updateCentre').find(':selected');
@@ -505,6 +530,7 @@ class StudentDashboard {
     };
   }
 
+  // Sends updated enrollment data to API and handles response
   async updateEnrollment(id, payload) {
     const response = await this.enrollmentServices.updateEnrollment(id, payload);
 
@@ -515,6 +541,7 @@ class StudentDashboard {
     return response;
   }
 
+  // Loads update form data and sets up modal for editing pending enrollment
   async handleUpdate(id) {
     try {
       const data = await this.loadUpdateData(id);
@@ -526,6 +553,7 @@ class StudentDashboard {
     }
   }
 
+  // Fetches and loads course and centre data for enrollment form dropdowns
   async loadEnrollDetails() {
     try {
       const courseData = await this.courseService.getCourse();
@@ -539,6 +567,7 @@ class StudentDashboard {
     }
   }
 
+  // Populates course dropdown options in both enroll and update modals
   populateCourseOptions(courseData) {
     const courseParent = document.getElementById('course');
     const updateCourseParent = document.getElementById('updateCourse');
@@ -557,6 +586,7 @@ class StudentDashboard {
     updateCourseParent.innerHTML = courseHTML;
   }
 
+  // Populates centre dropdown options in both enroll and update modals
   populateCentreOptions(centreData) {
     const centreParent = document.getElementById('centre');
     const updateCentreParent = document.getElementById('updateCentre');
@@ -573,10 +603,12 @@ class StudentDashboard {
     updateCentreParent.innerHTML = centreHTML;
   }
 
+  // Sets minimum date constraint to prevent selecting past dates for exam
   setExamMinimumDate() {
     $('#examDate').attr('min', new Date().toISOString().split('T')[0]);
   }
 
+  // Validates enrollment form fields using jQuery validation plugin
   validateEnrollForm() {
     const validator = $('#enrollForm').validate({
       errorClass: 'text-danger d-block mt-1',
@@ -595,6 +627,7 @@ class StudentDashboard {
     return validator.form();
   }
 
+  // Constructs payload object with all enrollment details from form fields
   getEnrollmentPayload() {
     const course = $('#course').find(':selected');
     const centre = $('#centre').find(':selected');
@@ -618,6 +651,7 @@ class StudentDashboard {
     };
   }
 
+  // Validates form and submits enrollment request to API after student confirmation
   async applyEnrollment() {
     if (!this.validateEnrollForm()) {
       return;
@@ -649,6 +683,7 @@ class StudentDashboard {
     }
   }
 
+  // Updates status filter, highlights active button, and reloads enrollment list
   setBtnState(status) {
     this.status = status;
     $('#allBtn, #apprBtn, #pendBtn, #rejBtn, #attnBtn').removeClass('btn-pink-gradient');
@@ -665,6 +700,7 @@ class StudentDashboard {
     this.loadEnrollment();
   }
 
+  // Applies date range filter to enrollment list after validation
   applyFilter() {
     const startDate = $('#startDateFilter').val();
     const endDate = $('#endDateFilter').val();
@@ -683,6 +719,7 @@ class StudentDashboard {
     this.filterModal.hide();
   }
 
+  // Clears all applied date filters and resets enrollment list to default view
   clearFilter() {
     $('#startDateFilter').val('');
     $('#endDateFilter').val('');
@@ -692,6 +729,7 @@ class StudentDashboard {
     this.loadEnrollment();
   }
 
+  // Initializes student dashboard with user data, stats, enrollments, and event listeners
   init() {
     this.dashboardUtils.toastrConfig();
     this.dashboardUtils.renderUserDetail(this.user[0]);

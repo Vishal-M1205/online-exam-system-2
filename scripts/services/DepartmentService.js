@@ -1,6 +1,7 @@
 import { DEP_API } from '../api.js';
 
 export class DepartmentService {
+  // Fetches all available departments from the API
   async getDepartment() {
     try {
       const response = await fetch(DEP_API);

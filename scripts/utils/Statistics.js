@@ -1,4 +1,5 @@
 export class Statistics {
+  // Aggregates enrollment counts by status (Pending, Approved, Rejected) and returns total
   calculateStats(enrollments) {
     const stats = enrollments.reduce(
       (result, e) => {
@@ -24,6 +25,7 @@ export class Statistics {
     return { total: enrollments.length, ...stats };
   }
 
+  // Converts enrollment status counts to percentage values
   calculateStatsPercent(data) {
     return {
       pending: (data.pending * 100) / data.total,

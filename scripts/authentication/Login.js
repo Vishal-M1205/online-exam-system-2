@@ -8,6 +8,8 @@ export class Login {
     this.loginValidator = new LoginValidator();
     this.dashboardUtils = new DashboardUtils();
   }
+
+  // Attaches submit event listener to login form
   setupEventListeners() {
     $('#login-form').on('submit', (e) => {
       e.preventDefault();
@@ -16,6 +18,7 @@ export class Login {
     });
   }
 
+  //controller for the login form submit
   async handleLogin() {
     if (!this.loginValidator.validateLoginForm()) {
       return;

@@ -3,9 +3,8 @@ import { SignupValidator } from '../validator/SignupValidator.js';
 import { DepartmentService } from '../services/DepartmentService.js';
 import { StudentService } from '../services/StudentService.js';
 
-// Regex for the validations
-
 export class Signup {
+  // Initializes the Signup class with required services and sets up the signup modal
   constructor() {
     this.dashboardUtils = new DashboardUtils();
     this.signupValidator = new SignupValidator();
@@ -15,6 +14,7 @@ export class Signup {
     this.signupModal = new bootstrap.Modal(document.getElementById('signupModal'));
   }
 
+  // Attaches event listeners to the signup form for form submission handling
   setupEventListeners() {
     $('#signup-form').on('submit', (e) => {
       e.preventDefault();
@@ -22,6 +22,7 @@ export class Signup {
     });
   }
 
+  // Validates form data and submits signup request to create a new student account
   async handleSubmit() {
     try {
       if (!this.signupValidator.validateSignupForm()) {
@@ -42,6 +43,7 @@ export class Signup {
     }
   }
 
+  // Collects and formats signup form data into a payload object for API submission
   async getSignupPayload() {
     return {
       name: $('#name').val().trim(),
@@ -57,6 +59,7 @@ export class Signup {
     };
   }
 
+  // Renders department options in the dropdown select element
   renderDepartment(data) {
     const parent = document.getElementById('department');
     let html = '';
@@ -68,6 +71,7 @@ export class Signup {
     parent.innerHTML = html;
   }
 
+  // Fetches department data from the service and populates the department dropdown
   async populateDepartmentOption() {
     try {
       const data = await this.departmentService.getDepartment();
@@ -77,6 +81,7 @@ export class Signup {
     }
   }
 
+  // Initializes the signup form by configuring toastr, setting date constraints, and populating departments
   init() {
     this.dashboardUtils.toastrConfig();
     this.signupValidator.setMinimumDateForDOB();
